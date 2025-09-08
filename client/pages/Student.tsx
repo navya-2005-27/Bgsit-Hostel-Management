@@ -114,6 +114,22 @@ export default function Student() {
             ) : (
               <div className="text-sm text-muted-foreground">Select your profile to view details</div>
             )}
+
+            {selected ? (
+              <div className="pt-4">
+                <div className="text-sm font-medium mb-2">Digital Student ID Card</div>
+                <StudentIDCard
+                  data={{
+                    id: selected.id,
+                    name: selected.details.name,
+                    contact: selected.details.studentContact,
+                    photoDataUrl: selected.details.profilePhotoDataUrl,
+                    hostelName: "BGSIT Girls Hostel",
+                    username: selected.username,
+                  }}
+                />
+              </div>
+            ) : null}
           </CardContent>
         </Card>
 
