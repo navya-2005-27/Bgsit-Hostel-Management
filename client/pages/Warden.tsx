@@ -79,6 +79,11 @@ export default function Warden() {
   const [now, setNow] = useState(Date.now());
   const [settings, setSettings] = useState<HostelSettings | null>(getHostelSettings());
 
+  // Mess state
+  const [weeklyOptions, setWeeklyOptions] = useState("Idli, Upma, Poha, Dosa, Paratha");
+  const [weeklyActive, setWeeklyActive] = useState(() => getActiveWeeklyPoll());
+  const [activeDayPolls, setActiveDayPolls] = useState(() => getActiveDailyMealPolls());
+
   useEffect(() => {
     setStudents(listStudents());
   }, []);
