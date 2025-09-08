@@ -214,6 +214,91 @@ export default function Warden() {
             <TabsTrigger value="details">Add Member Details</TabsTrigger>
           </TabsList>
 
+          {/* Mess Management */}
+          <TabsContent value="mess" className="mt-6">
+            <div className="grid gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><PieChart className="h-5 w-5" /> Weekly Menu Poll</CardTitle>
+                  <CardDescription>Create a weekly poll with options applied to all meals. Students vote for each meal.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {!weeklyActive ? (
+                    <div className="space-y-2">
+                      <Label>Options (comma-separated)</Label>
+                      <Input value={weeklyOptions} onChange={(e) => setWeeklyOptions(e.target.value)} />
+                      <Button onClick={() => { createWeeklyPoll(weeklyOptions.split(',').map((s) => s.trim()).filter(Boolean)); setWeeklyActive(getActiveWeeklyPoll()); }}>Create Weekly Poll</Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="rounded-md border p-3 text-sm">Week starting {weeklyActive.weekKey}. Poll is live.</div>
+                      <Button variant="secondary" onClick={() => { closeWeeklyPoll(); setWeeklyActive(getActiveWeeklyPoll()); }}>Close Weekly Poll</Button>
+                      {(() => { const r = getWeeklyResults(); if (!r) return null; return (
+                        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                          {WEEK_DAYS.map((d) => (
+                            <div key={d} className="rounded-md border p-3">
+                              <div className="mb-2 font-medium">{d}</div>
+                              {MEALS3.map((m) => (
+                                <div key={m} className="mb-2">
+                                  <div className="mb-1 text-xs text-muted-foreground">{m}</div>
+                                  {r.result[d][m].map((row) => (
+                                    <div key={row.option} className="mb-1">
+                                      <div className="flex items-center justify-between text-xs"><span>{row.option}</span><span>{row.percent}%</span></div>
+                                      <Progress value={row.percent} />
+                                    </div>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      ); })()}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle>Daily Food Attendance</CardTitle>
+                  <CardDescription>Start quick polls per meal with cutoff time and optional menu text.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {MEAL_SLOTS.map((meal) => (
+                    <div key={meal} className="rounded-md border p-3 space-y-2">
+                      <div className="text-sm font-medium">{meal}</div>
+                      <Input placeholder="Menu (optional)" id={`menu-${meal}`} />
+                      <Input placeholder="Cutoff minutes" defaultValue={60} id={`cut-${meal}`} />
+                      <Button onClick={() => { const menu = (document.getElementById(`menu-${meal}`) as HTMLInputElement)?.value || ""; const cut = Number((document.getElementById(`cut-${meal}`) as HTMLInputElement)?.value || 60); createDailyMealPoll(meal as any, { cutoffMinutes: cut, menuText: menu }); setActiveDayPolls(getActiveDailyMealPolls()); }}>Start</Button>
+                    </div>
+                  ))}
+
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Active polls today</div>
+                    {activeDayPolls.length ? activeDayPolls.map((p) => (
+                      <div key={p.id} className="rounded-md border p-3 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span>{p.meal} • ends {new Date(p.cutoffAt).toLocaleTimeString()}</span>
+                          <Button size="sm" variant="outline" onClick={() => { closeDailyMealPoll(p.id); setActiveDayPolls(getActiveDailyMealPolls()); }}>Close</Button>
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">Responses: {Object.keys(p.responses).length} / {students.length}</div>
+                      </div>
+                    )) : <div className="text-sm text-muted-foreground">No active polls</div>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="text-sm font-medium">Skipped meals this month</div>
+                    <ul className="space-y-1 text-sm">
+                      {students.map((s) => (
+                        <li key={s.id} className="flex items-center justify-between"><span className="truncate">{s.details.name}</span><span className="text-muted-foreground">{skippedMealsCount(s.id)}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Attendance */}
           <TabsContent value="attendance" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-3">
