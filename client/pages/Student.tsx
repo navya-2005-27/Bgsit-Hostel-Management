@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { listStudents, getStudentPublic, StudentId, getActiveAttendanceSession, markAttendanceWithToken } from "@/lib/studentStore";
+import { listStudents, getStudentPublic, StudentId, getActiveAttendanceSession, markAttendanceWithToken, // Mess
+  getActiveWeeklyPoll, WEEK_DAYS, MEALS3, voteWeekly, getActiveDailyMealPolls, respondDailyMeal, MEAL_SLOTS, skippedMealsCount } from "@/lib/studentStore";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export default function Student() {
   const [students, setStudents] = useState(listStudents());
