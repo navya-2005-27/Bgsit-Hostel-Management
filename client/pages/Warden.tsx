@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, KeyRound, RefreshCw, Plus, Eye, EyeOff, UploadCloud, Shield, QrCode, Bell } from "lucide-react";
+import { GraduationCap, KeyRound, RefreshCw, Plus, Eye, EyeOff, UploadCloud, Shield, QrCode, Bell, PieChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   StudentRecord,
