@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { GraduationCap, KeyRound, RefreshCw, Plus, Eye, EyeOff, UploadCloud, Shield } from "lucide-react";
+import { GraduationCap, KeyRound, RefreshCw, Plus, Eye, EyeOff, UploadCloud, Shield, QrCode, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   StudentRecord,
@@ -18,6 +18,19 @@ import {
   importFilesToDataUrls,
   suggestUsername,
   generatePassword,
+  // Attendance
+  AttendanceSession,
+  createAttendanceSession,
+  getActiveAttendanceSession,
+  listAttendanceForDate,
+  setManualPresence,
+  finalizeAttendance,
+  getAbsenteesForDate,
+  dateKey as getDateKey,
+  getHostelSettings,
+  setHostelSettings,
+  HostelSettings,
+  formatWhatsAppLink,
 } from "@/lib/studentStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
@@ -47,6 +60,11 @@ export default function Warden() {
     documents: [] as { name: string; dataUrl: string }[],
   });
 
+  // Attendance state
+  const [session, setSession] = useState<AttendanceSession | null>(getActiveAttendanceSession());
+  const [now, setNow] = useState(Date.now());
+  const [settings, setSettings] = useState<HostelSettings | null>(getHostelSettings());
+
   useEffect(() => {
     setStudents(listStudents());
   }, []);
@@ -54,6 +72,14 @@ export default function Warden() {
   useEffect(() => {
     if (studentName && !username) setUsername(suggestUsername(studentName));
   }, [studentName, username]);
+
+  useEffect(() => {
+    const i = setInterval(() => {
+      setNow(Date.now());
+      setSession(getActiveAttendanceSession());
+    }, 1000);
+    return () => clearInterval(i);
+  }, []);
 
   const selected = useMemo(() => students.find((s) => s.id === selectedId), [students, selectedId]);
 
@@ -124,6 +150,33 @@ export default function Warden() {
     setDetails((d) => ({ ...d, documents: [...(d.documents || []), ...docs] }));
   }
 
+  // ----- Attendance helpers
+  const activeDate = session?.dateKey || getDateKey();
+  const attendance = listAttendanceForDate(activeDate);
+  const presentSet = new Set(attendance.filter((a) => a.status === "present").map((a) => a.studentId));
+  const remainingMs = session ? Math.max(0, session.expiresAt - now) : 0;
+  const countdown = session ? new Date(remainingMs).toISOString().slice(14, 19) : "00:00";
+
+  function startSession() {
+    const s = createAttendanceSession();
+    setSession(s);
+    toast({ title: "QR generated", description: "Valid for 1 hour." });
+  }
+
+  function submitAttendance() {
+    finalizeAttendance(activeDate);
+    setSession(getActiveAttendanceSession());
+    toast({ title: "Attendance submitted", description: "Locked for the day." });
+  }
+
+  function saveSettings() {
+    if (!settings) return;
+    setHostelSettings(settings);
+    toast({ title: "Geofence saved", description: `${settings.radiusM}m radius` });
+  }
+
+  const absentees = useMemo(() => getAbsenteesForDate(activeDate), [activeDate, now, session]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-white dark:to-background">
       <div className="mx-auto max-w-6xl px-6 py-10">
@@ -132,12 +185,105 @@ export default function Warden() {
           <h1 className="text-2xl font-bold">Warden Section</h1>
         </div>
 
-        <Tabs defaultValue="account" className="w-full">
+        <Tabs defaultValue="attendance" className="w-full">
           <TabsList>
+            <TabsTrigger value="attendance">Attendance Management</TabsTrigger>
             <TabsTrigger value="account">Student Account Management</TabsTrigger>
             <TabsTrigger value="details">Add Member Details</TabsTrigger>
           </TabsList>
 
+          {/* Attendance */}
+          <TabsContent value="attendance" className="mt-6">
+            <div className="grid gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><QrCode className="h-5 w-5" /> QR Code</CardTitle>
+                  <CardDescription>Generate a QR valid for 1 hour. Students scan to mark present.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {session ? (
+                    <div className="space-y-3">
+                      <div className="rounded-lg border p-3 text-center">
+                        <img
+                          alt="QR"
+                          className="mx-auto aspect-square h-52 w-52"
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(session.token)}`}
+                        />
+                        <div className="mt-2 text-sm text-muted-foreground">Expires in {countdown}</div>
+                        <div className="mt-1 text-xs text-muted-foreground">Date: {activeDate}</div>
+                      </div>
+                      <Button onClick={submitAttendance} variant="secondary" className="w-full">Submit Attendance</Button>
+                    </div>
+                  ) : (
+                    <Button onClick={startSession} className="w-full">Generate QR</Button>
+                  )}
+
+                  <div className="pt-2">
+                    <div className="mb-2 text-sm font-medium">Geofence</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <Input placeholder="Latitude" value={settings?.center.lat ?? ""} onChange={(e) => setSettings({ center: { lat: Number(e.target.value || 0), lng: settings?.center.lng ?? 0 }, radiusM: settings?.radiusM ?? 50 })} />
+                      <Input placeholder="Longitude" value={settings?.center.lng ?? ""} onChange={(e) => setSettings({ center: { lat: settings?.center.lat ?? 0, lng: Number(e.target.value || 0) }, radiusM: settings?.radiusM ?? 50 })} />
+                      <Input placeholder="Radius (m)" value={settings?.radiusM ?? 50} onChange={(e) => setSettings({ center: settings?.center ?? { lat: 0, lng: 0 }, radiusM: Number(e.target.value || 0) })} />
+                    </div>
+                    <Button onClick={saveSettings} variant="outline" className="mt-2 w-full">Save Geofence</Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle>Attendance Sheet</CardTitle>
+                  <CardDescription>Toggle present/absent. Submitting locks for the day.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {students.map((s) => {
+                      const present = presentSet.has(s.id);
+                      return (
+                        <div key={s.id} className="flex items-center justify-between rounded-md border p-3">
+                          <div className="min-w-0">
+                            <div className="truncate font-medium">{s.details.name}</div>
+                            <div className="truncate text-xs text-muted-foreground">@{s.credentials?.username || "no-username"}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" variant={present ? "default" : "outline"} onClick={() => setManualPresence(activeDate, s.id, true)}>Present</Button>
+                            <Button size="sm" variant={!present ? "destructive" : "outline"} onClick={() => setManualPresence(activeDate, s.id, false)}>Absent</Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {session ? (
+                    <Button onClick={submitAttendance} className="mt-4">Submit Attendance</Button>
+                  ) : null}
+
+                  {absentees.length ? (
+                    <div className="mt-6">
+                      <div className="mb-2 flex items-center gap-2 text-sm font-medium"><Bell className="h-4 w-4" /> Parent Notifications</div>
+                      <ul className="space-y-2 text-sm">
+                        {absentees.map((s) => {
+                          const msg = `Your child ${s.details.name} was absent on ${activeDate}.`;
+                          const wa = formatWhatsAppLink(s.details.parentContact || s.details.studentContact, msg);
+                          return (
+                            <li key={s.id} className="flex items-center justify-between rounded-md border p-2">
+                              <span className="truncate">{s.details.name}</span>
+                              <div className="flex gap-2">
+                                <a className="text-primary underline" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>
+                                <a className="text-primary underline" href={`sms:${(s.details.parentContact || s.details.studentContact).replace(/[^0-9]/g, "")}?&body=${encodeURIComponent(msg)}`}>SMS</a>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ) : null}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Account */}
           <TabsContent value="account" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-2">
               <Card>
@@ -205,6 +351,7 @@ export default function Warden() {
             </div>
           </TabsContent>
 
+          {/* Details */}
           <TabsContent value="details" className="mt-6">
             <form onSubmit={handleSubmitDetails} className="grid gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2 space-y-4">
