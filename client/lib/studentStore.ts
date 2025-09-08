@@ -321,3 +321,180 @@ export function formatWhatsAppLink(phone: string, message: string) {
   const digits = phone.replace(/[^0-9]/g, "");
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
+
+// -------------------- Mess Polling (frontend-only demo) --------------------
+export const WEEK_DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] as const;
+export type WeekDay = typeof WEEK_DAYS[number];
+export const MEALS3 = ["Breakfast","Lunch","Dinner"] as const;
+export type Meal3 = typeof MEALS3[number];
+export const MEAL_SLOTS = ["Milk","Breakfast","Lunch","Snacks","Dinner"] as const;
+export type MealSlot = typeof MEAL_SLOTS[number];
+
+export type WeeklyPoll = {
+  id: string;
+  weekKey: string; // Monday date key
+  open: boolean;
+  options: Record<WeekDay, Record<Meal3, string[]>>;
+  votes: Record<StudentId, Partial<Record<WeekDay, Partial<Record<Meal3, string>>>>>;
+};
+export type WeeklyMenu = Record<WeekDay, Record<Meal3, string>>;
+
+export type DailyMealPoll = {
+  id: string;
+  dateKey: string;
+  meal: MealSlot;
+  menuText?: string;
+  cutoffAt: number;
+  open: boolean;
+  responses: Record<StudentId, "eating" | "not">;
+};
+
+const WEEKLY_POLLS_KEY = "campusstay.mess.weekly.polls.v1";
+const WEEKLY_MENUS_KEY = "campusstay.mess.weekly.menus.v1"; // { [weekKey]: WeeklyMenu }
+const DAILY_MEAL_POLLS_KEY = "campusstay.mess.daily.polls.v1";
+
+function readWeeklyPolls(): WeeklyPoll[] {
+  try { const raw = localStorage.getItem(WEEKLY_POLLS_KEY); return raw ? JSON.parse(raw) as WeeklyPoll[] : []; } catch { return []; }
+}
+function writeWeeklyPolls(p: WeeklyPoll[]) { localStorage.setItem(WEEKLY_POLLS_KEY, JSON.stringify(p)); }
+function readWeeklyMenus(): Record<string, WeeklyMenu> { try { const raw = localStorage.getItem(WEEKLY_MENUS_KEY); return raw ? JSON.parse(raw) as Record<string, WeeklyMenu> : {}; } catch { return {}; } }
+function writeWeeklyMenus(m: Record<string, WeeklyMenu>) { localStorage.setItem(WEEKLY_MENUS_KEY, JSON.stringify(m)); }
+function readDailyMealPolls(): DailyMealPoll[] { try { const raw = localStorage.getItem(DAILY_MEAL_POLLS_KEY); return raw ? JSON.parse(raw) as DailyMealPoll[] : []; } catch { return []; } }
+function writeDailyMealPolls(p: DailyMealPoll[]) { localStorage.setItem(DAILY_MEAL_POLLS_KEY, JSON.stringify(p)); }
+
+export function weekStartKey(d = new Date()) {
+  const day = d.getDay(); // 0 Sun -> 6 Sat
+  const delta = (day + 6) % 7; // to Monday
+  const monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - delta);
+  return dateKey(monday);
+}
+
+export function createWeeklyPoll(optionsForAllMeals: string[] = ["Idli","Upma","Poha","Dosa","Paratha"]) {
+  const week = weekStartKey();
+  const base: Record<Meal3, string[]> = { Breakfast: optionsForAllMeals, Lunch: optionsForAllMeals, Dinner: optionsForAllMeals };
+  const options: WeeklyPoll["options"] = Object.fromEntries(WEEK_DAYS.map((d) => [d, { ...base }])) as any;
+  const poll: WeeklyPoll = { id: uid(), weekKey: week, open: true, options, votes: {} };
+  const polls = readWeeklyPolls();
+  polls.push(poll);
+  writeWeeklyPolls(polls);
+  return poll;
+}
+
+export function getActiveWeeklyPoll(): WeeklyPoll | null {
+  const wk = weekStartKey();
+  const polls = readWeeklyPolls();
+  return polls.find((p) => p.weekKey === wk && p.open) || null;
+}
+
+export function voteWeekly(day: WeekDay, meal: Meal3, option: string, studentId: StudentId) {
+  const poll = getActiveWeeklyPoll();
+  if (!poll) throw new Error("No active weekly poll");
+  if (!poll.options[day][meal].includes(option)) throw new Error("Invalid option");
+  poll.votes[studentId] = poll.votes[studentId] || {};
+  poll.votes[studentId]![day] = poll.votes[studentId]![day] || {};
+  (poll.votes[studentId]![day] as any)[meal] = option;
+  const polls = readWeeklyPolls();
+  const idx = polls.findIndex((p) => p.id === poll.id);
+  polls[idx] = poll;
+  writeWeeklyPolls(polls);
+}
+
+export function closeWeeklyPoll() {
+  const poll = getActiveWeeklyPoll();
+  if (!poll) return null;
+  const menu: WeeklyMenu = Object.fromEntries(
+    WEEK_DAYS.map((d) => [d, Object.fromEntries(MEALS3.map((m) => {
+      const counts: Record<string, number> = {};
+      Object.values(poll.votes).forEach((perStudent) => {
+        const choice = (perStudent[d] || ({} as any))[m];
+        if (choice) counts[choice] = (counts[choice] || 0) + 1;
+      });
+      let best = poll.options[d][m][0];
+      let bestCount = -1;
+      for (const opt of poll.options[d][m]) {
+        const c = counts[opt] || 0;
+        if (c > bestCount) { best = opt; bestCount = c; }
+      }
+      return [m, best];
+    })) as Record<Meal3, string>])
+  ) as any;
+
+  poll.open = false;
+  const polls = readWeeklyPolls();
+  polls[polls.findIndex((p) => p.id === poll.id)] = poll;
+  writeWeeklyPolls(polls);
+  const menus = readWeeklyMenus();
+  menus[poll.weekKey] = menu;
+  writeWeeklyMenus(menus);
+  return { poll, menu };
+}
+
+export function getWeeklyResults() {
+  const poll = getActiveWeeklyPoll();
+  const target = poll || readWeeklyPolls().slice(-1)[0];
+  if (!target) return null;
+  const totals = Object.keys(target.votes).length || 0;
+  const result: Record<WeekDay, Record<Meal3, { option: string; percent: number }[]>> = {} as any;
+  for (const d of WEEK_DAYS) {
+    result[d] = {} as any;
+    for (const m of MEALS3) {
+      const counts: Record<string, number> = {};
+      Object.values(target.votes).forEach((s) => {
+        const choice = (s[d] || ({} as any))[m];
+        if (choice) counts[choice] = (counts[choice] || 0) + 1;
+      });
+      result[d][m] = target.options[d][m].map((opt) => ({ option: opt, percent: totals ? Math.round(((counts[opt] || 0) / totals) * 100) : 0 }));
+    }
+  }
+  return { poll: target, result, totals };
+}
+
+export function getMenuForWeek(weekKey = weekStartKey()): WeeklyMenu | null {
+  const menus = readWeeklyMenus();
+  return menus[weekKey] || null;
+}
+
+// Daily meal attendance polls
+export function createDailyMealPoll(meal: MealSlot, { cutoffMinutes = 60, menuText = "" } = {}) {
+  const dKey = dateKey();
+  const p: DailyMealPoll = { id: uid(), dateKey: dKey, meal, menuText, cutoffAt: Date.now() + cutoffMinutes * 60 * 1000, open: true, responses: {} };
+  const polls = readDailyMealPolls();
+  polls.push(p);
+  writeDailyMealPolls(polls);
+  return p;
+}
+
+export function getActiveDailyMealPolls(forDate = dateKey()): DailyMealPoll[] {
+  const now = Date.now();
+  return readDailyMealPolls().filter((p) => p.dateKey === forDate && p.open && now < p.cutoffAt);
+}
+
+export function respondDailyMeal(studentId: StudentId, pollId: string, value: "eating" | "not") {
+  const polls = readDailyMealPolls();
+  const idx = polls.findIndex((p) => p.id === pollId);
+  if (idx === -1) throw new Error("Poll not found");
+  const p = polls[idx];
+  if (!p.open || Date.now() > p.cutoffAt) throw new Error("Poll closed");
+  p.responses[studentId] = value;
+  polls[idx] = p;
+  writeDailyMealPolls(polls);
+}
+
+export function closeDailyMealPoll(pollId: string) {
+  const polls = readDailyMealPolls();
+  const idx = polls.findIndex((p) => p.id === pollId);
+  if (idx === -1) return;
+  polls[idx].open = false;
+  writeDailyMealPolls(polls);
+}
+
+export function listDailyPollsForDate(dKey = dateKey()) {
+  return readDailyMealPolls().filter((p) => p.dateKey === dKey);
+}
+
+export function skippedMealsCount(studentId: StudentId, monthKey = new Date().toISOString().slice(0,7)) {
+  const polls = readDailyMealPolls().filter((p) => p.dateKey.startsWith(monthKey));
+  let count = 0;
+  for (const p of polls) { if (p.responses[studentId] === "not") count++; }
+  return count;
+}
