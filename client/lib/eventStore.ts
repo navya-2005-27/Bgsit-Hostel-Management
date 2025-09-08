@@ -1,7 +1,13 @@
 import { type StudentId } from "./studentStore";
 
 export type OrganizerType = "student" | "warden";
-export type EventType = "Cultural" | "Sports" | "Workshop" | "Festival" | "Party" | "Other";
+export type EventType =
+  | "Cultural"
+  | "Sports"
+  | "Workshop"
+  | "Festival"
+  | "Party"
+  | "Other";
 
 export type EventComment = {
   id: string;
@@ -35,15 +41,24 @@ function uid() {
 }
 
 function readEvents(): EventRecord[] {
-  try { const raw = localStorage.getItem(EVENTS_KEY); return raw ? (JSON.parse(raw) as EventRecord[]) : []; } catch { return []; }
+  try {
+    const raw = localStorage.getItem(EVENTS_KEY);
+    return raw ? (JSON.parse(raw) as EventRecord[]) : [];
+  } catch {
+    return [];
+  }
 }
-function writeEvents(e: EventRecord[]) { localStorage.setItem(EVENTS_KEY, JSON.stringify(e)); }
+function writeEvents(e: EventRecord[]) {
+  localStorage.setItem(EVENTS_KEY, JSON.stringify(e));
+}
 
 export function listEvents() {
-  return readEvents().sort((a,b) => a.dateISO.localeCompare(b.dateISO));
+  return readEvents().sort((a, b) => a.dateISO.localeCompare(b.dateISO));
 }
 export function listUpcoming(now = new Date()) {
-  return listEvents().filter((e) => e.status !== "rejected" && new Date(e.dateISO) >= now);
+  return listEvents().filter(
+    (e) => e.status !== "rejected" && new Date(e.dateISO) >= now,
+  );
 }
 export function listPast(now = new Date()) {
   return listEvents().filter((e) => new Date(e.dateISO) < now);
@@ -63,7 +78,11 @@ export type NewEvent = {
   posterDataUrl?: string;
 };
 
-export function createEvent(payload: NewEvent, organizer: OrganizerType, organizerName?: string) {
+export function createEvent(
+  payload: NewEvent,
+  organizer: OrganizerType,
+  organizerName?: string,
+) {
   const rec: EventRecord = {
     id: uid(),
     name: payload.name.trim(),
@@ -119,17 +138,30 @@ export function registerForEvent(eventId: string, studentId: StudentId) {
   writeEvents(all);
 }
 
-export function addEventComment(eventId: string, author: OrganizerType, text: string) {
+export function addEventComment(
+  eventId: string,
+  author: OrganizerType,
+  text: string,
+) {
   const all = readEvents();
   const idx = all.findIndex((e) => e.id === eventId);
   if (idx === -1) return;
-  all[idx].comments.push({ id: uid(), author, text: text.trim(), dateISO: new Date().toISOString() });
+  all[idx].comments.push({
+    id: uid(),
+    author,
+    text: text.trim(),
+    dateISO: new Date().toISOString(),
+  });
   writeEvents(all);
 }
 
 export function eventAnalytics() {
   const all = readEvents();
-  const participants = all.map((e) => ({ id: e.id, name: e.name, count: e.registrations.length }));
+  const participants = all.map((e) => ({
+    id: e.id,
+    name: e.name,
+    count: e.registrations.length,
+  }));
   const byType: Record<string, number> = {};
   for (const e of all) byType[e.type] = (byType[e.type] || 0) + 1;
   const ratio = {

@@ -10,7 +10,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -37,15 +43,22 @@ export default function Index() {
         </span>
         <h1 className="mx-auto max-w-3xl text-pretty text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl">
           A stylish modern portal for your hostel
-          <span className="bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent"> access</span>
+          <span className="bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
+            {" "}
+            access
+          </span>
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-balance text-lg text-muted-foreground">
-          Seamless entry for students. Powerful controls for wardens. Beautifully crafted for speed and clarity.
+          Seamless entry for students. Powerful controls for wardens.
+          Beautifully crafted for speed and clarity.
         </p>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="lg" className="group mt-10 h-12 rounded-full bg-gradient-to-r from-primary to-fuchsia-600 px-8 text-base shadow-[0_10px_30px_-10px_hsl(var(--primary)/.6)] transition-transform hover:scale-[1.02]">
+            <Button
+              size="lg"
+              className="group mt-10 h-12 rounded-full bg-gradient-to-r from-primary to-fuchsia-600 px-8 text-base shadow-[0_10px_30px_-10px_hsl(var(--primary)/.6)] transition-transform hover:scale-[1.02]"
+            >
               Get Started
               <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
             </Button>
@@ -54,7 +67,8 @@ export default function Index() {
             <DialogHeader>
               <DialogTitle className="text-2xl">Choose your role</DialogTitle>
               <DialogDescription>
-                Select how you want to log in. Each role gets a tailored experience.
+                Select how you want to log in. Each role gets a tailored
+                experience.
               </DialogDescription>
             </DialogHeader>
 
@@ -65,7 +79,10 @@ export default function Index() {
                 icon={<GraduationCap className="h-6 w-6" />}
                 gradient="from-emerald-500 via-emerald-600 to-teal-500"
                 onClick={() => {
-                  toast({ title: "Student login", description: "Proceeding as Student." });
+                  toast({
+                    title: "Student login",
+                    description: "Proceeding as Student.",
+                  });
                   setOpen(false);
                   navigate("/student");
                 }}
@@ -77,7 +94,10 @@ export default function Index() {
                 icon={<Shield className="h-6 w-6" />}
                 gradient="from-indigo-500 via-violet-600 to-fuchsia-500"
                 onClick={() => {
-                  toast({ title: "Warden login", description: "Proceeding as Warden." });
+                  toast({
+                    title: "Warden login",
+                    description: "Proceeding as Warden.",
+                  });
                   setOpen(false);
                   navigate("/warden");
                 }}
@@ -87,7 +107,9 @@ export default function Index() {
         </Dialog>
 
         {/* Subtle footer note */}
-        <p className="mt-14 text-xs text-muted-foreground/80">CampusStay • Crafted with care</p>
+        <p className="mt-14 text-xs text-muted-foreground/80">
+          CampusStay • Crafted with care
+        </p>
       </main>
     </div>
   );

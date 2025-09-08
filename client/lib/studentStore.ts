@@ -51,13 +51,18 @@ export function getStudent(id: StudentId): StudentRecord | undefined {
   return readAll().find((s) => s.id === id);
 }
 
-export function findStudentByUsername(username: string): StudentRecord | undefined {
+export function findStudentByUsername(
+  username: string,
+): StudentRecord | undefined {
   const u = username.trim().toLowerCase();
   return readAll().find((s) => s.credentials?.username.toLowerCase() === u);
 }
 
 const SESSION_KEY = "campusstay.session.studentId.v1";
-export function authenticateStudent(username: string, password: string): StudentRecord | null {
+export function authenticateStudent(
+  username: string,
+  password: string,
+): StudentRecord | null {
   const s = findStudentByUsername(username);
   if (!s || !s.credentials) return null;
   if (s.credentials.password !== password) return null;
@@ -74,12 +79,15 @@ export function logoutStudent() {
 export function upsertStudent(record: StudentRecord): StudentRecord {
   const all = readAll();
   const idx = all.findIndex((s) => s.id === record.id);
-  if (idx >= 0) all[idx] = record; else all.push(record);
+  if (idx >= 0) all[idx] = record;
+  else all.push(record);
   writeAll(all);
   return record;
 }
 
-export function createStudent(details: Partial<StudentDetails> & { name: string }): StudentRecord {
+export function createStudent(
+  details: Partial<StudentDetails> & { name: string },
+): StudentRecord {
   const record: StudentRecord = {
     id: uid(),
     details: {
@@ -111,7 +119,12 @@ export function resetPassword(id: StudentId, newPassword: string) {
   const idx = all.findIndex((s) => s.id === id);
   if (idx === -1) throw new Error("Student not found");
   const current = all[idx];
-  all[idx] = { ...current, credentials: current.credentials ? { ...current.credentials, password: newPassword } : undefined };
+  all[idx] = {
+    ...current,
+    credentials: current.credentials
+      ? { ...current.credentials, password: newPassword }
+      : undefined,
+  };
   writeAll(all);
 }
 
@@ -140,14 +153,17 @@ export function updateDetails(id: StudentId, patch: Partial<StudentDetails>) {
   }
 }
 
-export function importFilesToDataUrls(files: FileList | File[]): Promise<{ name: string; dataUrl: string }[]> {
+export function importFilesToDataUrls(
+  files: FileList | File[],
+): Promise<{ name: string; dataUrl: string }[]> {
   const arr = Array.from(files);
   return Promise.all(
     arr.map(
       (file) =>
         new Promise<{ name: string; dataUrl: string }>((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = () => resolve({ name: file.name, dataUrl: String(reader.result) });
+          reader.onload = () =>
+            resolve({ name: file.name, dataUrl: String(reader.result) });
           reader.onerror = reject;
           reader.readAsDataURL(file);
         }),
@@ -156,14 +172,22 @@ export function importFilesToDataUrls(files: FileList | File[]): Promise<{ name:
 }
 
 export function suggestUsername(name: string): string {
-  const clean = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.|\.$/g, "");
+  const clean = name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ".")
+    .replace(/^\.|\.$/g, "");
   const tail = Math.floor(1000 + Math.random() * 9000);
   return `${clean || "student"}.${tail}`;
 }
 
 export function generatePassword(length = 12): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
-  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  const chars =
+    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
+  return Array.from(
+    { length },
+    () => chars[Math.floor(Math.random() * chars.length)],
+  ).join("");
 }
 
 // -------------------- Attendance & Geofencing (frontend-only demo) --------------------
@@ -192,7 +216,9 @@ const RECORDS_KEY = "campusstay.attendance.records.v1";
 const SETTINGS_KEY = "campusstay.hostel.settings.v1";
 
 export function dateKey(d = new Date()) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    .toISOString()
+    .slice(0, 10);
 }
 
 function readSessions(): AttendanceSession[] {
@@ -237,7 +263,9 @@ export function haversineMeters(a: GeoPoint, b: GeoPoint) {
   const dLon = toRad(b.lng - a.lng);
   const lat1 = toRad(a.lat);
   const lat2 = toRad(b.lat);
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
@@ -247,7 +275,10 @@ export function withinFence(point: GeoPoint): boolean {
   return haversineMeters(point, s.center) <= s.radiusM;
 }
 
-export function createAttendanceSession({ durationMs = 60 * 60 * 1000, forDate = dateKey() } = {}) {
+export function createAttendanceSession({
+  durationMs = 60 * 60 * 1000,
+  forDate = dateKey(),
+} = {}) {
   const now = Date.now();
   const session: AttendanceSession = {
     id: uid(),
@@ -280,9 +311,15 @@ export function listAttendanceForDate(date: string): AttendanceRecord[] {
   return readRecords().filter((r) => r.dateKey === date);
 }
 
-export function setManualPresence(date: string, studentId: StudentId, present: boolean) {
+export function setManualPresence(
+  date: string,
+  studentId: StudentId,
+  present: boolean,
+) {
   const recs = readRecords();
-  const idx = recs.findIndex((r) => r.dateKey === date && r.studentId === studentId);
+  const idx = recs.findIndex(
+    (r) => r.dateKey === date && r.studentId === studentId,
+  );
   const base: AttendanceRecord = {
     studentId,
     dateKey: date,
@@ -297,17 +334,24 @@ export function setManualPresence(date: string, studentId: StudentId, present: b
 export function finalizeAttendance(date: string) {
   const allStudents = listStudents();
   const recs = readRecords();
-  const presentSet = new Set(recs.filter((r) => r.dateKey === date && r.status === "present").map((r) => r.studentId));
+  const presentSet = new Set(
+    recs
+      .filter((r) => r.dateKey === date && r.status === "present")
+      .map((r) => r.studentId),
+  );
   for (const s of allStudents) {
     if (!presentSet.has(s.id)) {
-      const existingIdx = recs.findIndex((r) => r.dateKey === date && r.studentId === s.id);
+      const existingIdx = recs.findIndex(
+        (r) => r.dateKey === date && r.studentId === s.id,
+      );
       const base: AttendanceRecord = {
         studentId: s.id,
         dateKey: date,
         time: new Date().toISOString(),
         status: "absent",
       };
-      if (existingIdx >= 0) recs[existingIdx] = { ...recs[existingIdx], ...base };
+      if (existingIdx >= 0)
+        recs[existingIdx] = { ...recs[existingIdx], ...base };
       else recs.push(base);
     }
   }
@@ -315,14 +359,21 @@ export function finalizeAttendance(date: string) {
   lockAttendance(date);
 }
 
-export function markAttendanceWithToken(token: string, studentId: StudentId, point?: GeoPoint) {
+export function markAttendanceWithToken(
+  token: string,
+  studentId: StudentId,
+  point?: GeoPoint,
+) {
   const session = getActiveAttendanceSession();
-  if (!session || session.token !== token) throw new Error("Invalid or expired QR");
+  if (!session || session.token !== token)
+    throw new Error("Invalid or expired QR");
   if (Date.now() > session.expiresAt) throw new Error("QR expired");
   if (point && !withinFence(point)) throw new Error("Outside hostel geofence");
 
   const recs = readRecords();
-  const idx = recs.findIndex((r) => r.dateKey === session.dateKey && r.studentId === studentId);
+  const idx = recs.findIndex(
+    (r) => r.dateKey === session.dateKey && r.studentId === studentId,
+  );
   const base: AttendanceRecord = {
     studentId,
     dateKey: session.dateKey,
@@ -338,7 +389,9 @@ export function markAttendanceWithToken(token: string, studentId: StudentId, poi
 
 export function getAbsenteesForDate(date: string): StudentRecord[] {
   const recs = listAttendanceForDate(date);
-  const presentSet = new Set(recs.filter((r) => r.status === "present").map((r) => r.studentId));
+  const presentSet = new Set(
+    recs.filter((r) => r.status === "present").map((r) => r.studentId),
+  );
   return listStudents().filter((s) => !presentSet.has(s.id));
 }
 
@@ -361,41 +414,87 @@ export type Payment = {
 const PAYMENTS_KEY = "campusstay.payments.v1";
 
 function readPayments(): Payment[] {
-  try { const raw = localStorage.getItem(PAYMENTS_KEY); return raw ? (JSON.parse(raw) as Payment[]) : []; } catch { return []; }
+  try {
+    const raw = localStorage.getItem(PAYMENTS_KEY);
+    return raw ? (JSON.parse(raw) as Payment[]) : [];
+  } catch {
+    return [];
+  }
 }
-function writePayments(p: Payment[]) { localStorage.setItem(PAYMENTS_KEY, JSON.stringify(p)); }
+function writePayments(p: Payment[]) {
+  localStorage.setItem(PAYMENTS_KEY, JSON.stringify(p));
+}
 
 export function listPaymentsByStudent(studentId: StudentId): Payment[] {
-  return readPayments().filter((p) => p.studentId === studentId).sort((a,b)=>a.dateISO.localeCompare(b.dateISO));
+  return readPayments()
+    .filter((p) => p.studentId === studentId)
+    .sort((a, b) => a.dateISO.localeCompare(b.dateISO));
 }
 
-export function addPayment(studentId: StudentId, amount: number, method: PaymentMethod, date = new Date(), note?: string): Payment {
-  const rec: Payment = { id: uid(), studentId, amount: Number(amount) || 0, method, dateISO: date.toISOString(), note };
+export function addPayment(
+  studentId: StudentId,
+  amount: number,
+  method: PaymentMethod,
+  date = new Date(),
+  note?: string,
+): Payment {
+  const rec: Payment = {
+    id: uid(),
+    studentId,
+    amount: Number(amount) || 0,
+    method,
+    dateISO: date.toISOString(),
+    note,
+  };
   const all = readPayments();
   all.push(rec);
   writePayments(all);
   return rec;
 }
 
-export function paymentTotals(studentId: StudentId): { rent: number; paid: number; due: number } {
+export function paymentTotals(studentId: StudentId): {
+  rent: number;
+  paid: number;
+  due: number;
+} {
   const s = getStudent(studentId);
   const rent = s?.details.totalAmount ?? 0;
-  const paid = listPaymentsByStudent(studentId).reduce((sum, r) => sum + r.amount, 0);
+  const paid = listPaymentsByStudent(studentId).reduce(
+    (sum, r) => sum + r.amount,
+    0,
+  );
   const due = Math.max(0, (rent || 0) - paid);
   return { rent: rent || 0, paid, due };
 }
 
 export type PaymentStatus = "paid" | "pending" | "overdue";
-export function computeStatus(t: { rent: number; paid: number; due: number }, overdueDay = 10): PaymentStatus {
+export function computeStatus(
+  t: { rent: number; paid: number; due: number },
+  overdueDay = 10,
+): PaymentStatus {
   if (t.due <= 0) return "paid";
   const today = new Date();
   return today.getDate() > overdueDay ? "overdue" : "pending";
 }
 
-export function paymentSummaryAll(): { id: StudentId; name: string; rent: number; paid: number; due: number; status: PaymentStatus }[] {
+export function paymentSummaryAll(): {
+  id: StudentId;
+  name: string;
+  rent: number;
+  paid: number;
+  due: number;
+  status: PaymentStatus;
+}[] {
   return listStudents().map((s) => {
     const t = paymentTotals(s.id);
-    return { id: s.id, name: s.details.name, rent: t.rent, paid: t.paid, due: t.due, status: computeStatus(t) };
+    return {
+      id: s.id,
+      name: s.details.name,
+      rent: t.rent,
+      paid: t.paid,
+      due: t.due,
+      status: computeStatus(t),
+    };
   });
 }
 
@@ -416,7 +515,7 @@ export const COMPLAINT_CATEGORIES = [
   "Water",
   "Other",
 ] as const;
-export type ComplaintCategory = typeof COMPLAINT_CATEGORIES[number];
+export type ComplaintCategory = (typeof COMPLAINT_CATEGORIES)[number];
 export type ComplaintStatus = "pending" | "done";
 export type Complaint = {
   id: string;
@@ -432,17 +531,44 @@ const COMPLAINTS_KEY = "campusstay.complaints.v1";
 const COMPLAINT_UPVOTED_IDS_KEY = "campusstay.complaints.upvoted.ids.v1"; // device-level safeguard
 
 function readComplaints(): Complaint[] {
-  try { const raw = localStorage.getItem(COMPLAINTS_KEY); return raw ? (JSON.parse(raw) as Complaint[]) : []; } catch { return []; }
+  try {
+    const raw = localStorage.getItem(COMPLAINTS_KEY);
+    return raw ? (JSON.parse(raw) as Complaint[]) : [];
+  } catch {
+    return [];
+  }
 }
-function writeComplaints(c: Complaint[]) { localStorage.setItem(COMPLAINTS_KEY, JSON.stringify(c)); }
+function writeComplaints(c: Complaint[]) {
+  localStorage.setItem(COMPLAINTS_KEY, JSON.stringify(c));
+}
 
 function readUpvotedIds(): Set<string> {
-  try { const raw = localStorage.getItem(COMPLAINT_UPVOTED_IDS_KEY); return new Set(raw ? (JSON.parse(raw) as string[]) : []); } catch { return new Set(); }
+  try {
+    const raw = localStorage.getItem(COMPLAINT_UPVOTED_IDS_KEY);
+    return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+  } catch {
+    return new Set();
+  }
 }
-function writeUpvotedIds(set: Set<string>) { localStorage.setItem(COMPLAINT_UPVOTED_IDS_KEY, JSON.stringify(Array.from(set))); }
+function writeUpvotedIds(set: Set<string>) {
+  localStorage.setItem(
+    COMPLAINT_UPVOTED_IDS_KEY,
+    JSON.stringify(Array.from(set)),
+  );
+}
 
-export function createComplaint(text: string, category: ComplaintCategory): Complaint {
-  const c: Complaint = { id: uid(), text: text.trim(), category, submittedAt: new Date().toISOString(), upvotes: 0, status: "pending" };
+export function createComplaint(
+  text: string,
+  category: ComplaintCategory,
+): Complaint {
+  const c: Complaint = {
+    id: uid(),
+    text: text.trim(),
+    category,
+    submittedAt: new Date().toISOString(),
+    upvotes: 0,
+    status: "pending",
+  };
   const all = readComplaints();
   all.push(c);
   writeComplaints(all);
@@ -452,7 +578,10 @@ export function createComplaint(text: string, category: ComplaintCategory): Comp
 export function listComplaints(): Complaint[] {
   const all = readComplaints();
   // sort by upvotes desc, then newest
-  return all.sort((a, b) => (b.upvotes - a.upvotes) || b.submittedAt.localeCompare(a.submittedAt));
+  return all.sort(
+    (a, b) =>
+      b.upvotes - a.upvotes || b.submittedAt.localeCompare(a.submittedAt),
+  );
 }
 export function listActiveComplaints(): Complaint[] {
   return listComplaints().filter((c) => c.status === "pending");
@@ -491,19 +620,36 @@ export function complaintDaysTaken(c: Complaint): number {
 }
 
 // -------------------- Mess Polling (frontend-only demo) --------------------
-export const WEEK_DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] as const;
-export type WeekDay = typeof WEEK_DAYS[number];
-export const MEALS3 = ["Breakfast","Lunch","Dinner"] as const;
-export type Meal3 = typeof MEALS3[number];
-export const MEAL_SLOTS = ["Milk","Breakfast","Lunch","Snacks","Dinner"] as const;
-export type MealSlot = typeof MEAL_SLOTS[number];
+export const WEEK_DAYS = [
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+  "Sun",
+] as const;
+export type WeekDay = (typeof WEEK_DAYS)[number];
+export const MEALS3 = ["Breakfast", "Lunch", "Dinner"] as const;
+export type Meal3 = (typeof MEALS3)[number];
+export const MEAL_SLOTS = [
+  "Milk",
+  "Breakfast",
+  "Lunch",
+  "Snacks",
+  "Dinner",
+] as const;
+export type MealSlot = (typeof MEAL_SLOTS)[number];
 
 export type WeeklyPoll = {
   id: string;
   weekKey: string; // Monday date key
   open: boolean;
   options: Record<WeekDay, Record<Meal3, string[]>>;
-  votes: Record<StudentId, Partial<Record<WeekDay, Partial<Record<Meal3, string>>>>>;
+  votes: Record<
+    StudentId,
+    Partial<Record<WeekDay, Partial<Record<Meal3, string>>>>
+  >;
 };
 export type WeeklyMenu = Record<WeekDay, Record<Meal3, string>>;
 
@@ -522,13 +668,38 @@ const WEEKLY_MENUS_KEY = "campusstay.mess.weekly.menus.v1"; // { [weekKey]: Week
 const DAILY_MEAL_POLLS_KEY = "campusstay.mess.daily.polls.v1";
 
 function readWeeklyPolls(): WeeklyPoll[] {
-  try { const raw = localStorage.getItem(WEEKLY_POLLS_KEY); return raw ? JSON.parse(raw) as WeeklyPoll[] : []; } catch { return []; }
+  try {
+    const raw = localStorage.getItem(WEEKLY_POLLS_KEY);
+    return raw ? (JSON.parse(raw) as WeeklyPoll[]) : [];
+  } catch {
+    return [];
+  }
 }
-function writeWeeklyPolls(p: WeeklyPoll[]) { localStorage.setItem(WEEKLY_POLLS_KEY, JSON.stringify(p)); }
-function readWeeklyMenus(): Record<string, WeeklyMenu> { try { const raw = localStorage.getItem(WEEKLY_MENUS_KEY); return raw ? JSON.parse(raw) as Record<string, WeeklyMenu> : {}; } catch { return {}; } }
-function writeWeeklyMenus(m: Record<string, WeeklyMenu>) { localStorage.setItem(WEEKLY_MENUS_KEY, JSON.stringify(m)); }
-function readDailyMealPolls(): DailyMealPoll[] { try { const raw = localStorage.getItem(DAILY_MEAL_POLLS_KEY); return raw ? JSON.parse(raw) as DailyMealPoll[] : []; } catch { return []; } }
-function writeDailyMealPolls(p: DailyMealPoll[]) { localStorage.setItem(DAILY_MEAL_POLLS_KEY, JSON.stringify(p)); }
+function writeWeeklyPolls(p: WeeklyPoll[]) {
+  localStorage.setItem(WEEKLY_POLLS_KEY, JSON.stringify(p));
+}
+function readWeeklyMenus(): Record<string, WeeklyMenu> {
+  try {
+    const raw = localStorage.getItem(WEEKLY_MENUS_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, WeeklyMenu>) : {};
+  } catch {
+    return {};
+  }
+}
+function writeWeeklyMenus(m: Record<string, WeeklyMenu>) {
+  localStorage.setItem(WEEKLY_MENUS_KEY, JSON.stringify(m));
+}
+function readDailyMealPolls(): DailyMealPoll[] {
+  try {
+    const raw = localStorage.getItem(DAILY_MEAL_POLLS_KEY);
+    return raw ? (JSON.parse(raw) as DailyMealPoll[]) : [];
+  } catch {
+    return [];
+  }
+}
+function writeDailyMealPolls(p: DailyMealPoll[]) {
+  localStorage.setItem(DAILY_MEAL_POLLS_KEY, JSON.stringify(p));
+}
 
 export function weekStartKey(d = new Date()) {
   const day = d.getDay(); // 0 Sun -> 6 Sat
@@ -537,11 +708,25 @@ export function weekStartKey(d = new Date()) {
   return dateKey(monday);
 }
 
-export function createWeeklyPoll(optionsForAllMeals: string[] = ["Idli","Upma","Poha","Dosa","Paratha"]) {
+export function createWeeklyPoll(
+  optionsForAllMeals: string[] = ["Idli", "Upma", "Poha", "Dosa", "Paratha"],
+) {
   const week = weekStartKey();
-  const base: Record<Meal3, string[]> = { Breakfast: optionsForAllMeals, Lunch: optionsForAllMeals, Dinner: optionsForAllMeals };
-  const options: WeeklyPoll["options"] = Object.fromEntries(WEEK_DAYS.map((d) => [d, { ...base }])) as any;
-  const poll: WeeklyPoll = { id: uid(), weekKey: week, open: true, options, votes: {} };
+  const base: Record<Meal3, string[]> = {
+    Breakfast: optionsForAllMeals,
+    Lunch: optionsForAllMeals,
+    Dinner: optionsForAllMeals,
+  };
+  const options: WeeklyPoll["options"] = Object.fromEntries(
+    WEEK_DAYS.map((d) => [d, { ...base }]),
+  ) as any;
+  const poll: WeeklyPoll = {
+    id: uid(),
+    weekKey: week,
+    open: true,
+    options,
+    votes: {},
+  };
   const polls = readWeeklyPolls();
   polls.push(poll);
   writeWeeklyPolls(polls);
@@ -554,10 +739,16 @@ export function getActiveWeeklyPoll(): WeeklyPoll | null {
   return polls.find((p) => p.weekKey === wk && p.open) || null;
 }
 
-export function voteWeekly(day: WeekDay, meal: Meal3, option: string, studentId: StudentId) {
+export function voteWeekly(
+  day: WeekDay,
+  meal: Meal3,
+  option: string,
+  studentId: StudentId,
+) {
   const poll = getActiveWeeklyPoll();
   if (!poll) throw new Error("No active weekly poll");
-  if (!poll.options[day][meal].includes(option)) throw new Error("Invalid option");
+  if (!poll.options[day][meal].includes(option))
+    throw new Error("Invalid option");
   poll.votes[studentId] = poll.votes[studentId] || {};
   poll.votes[studentId]![day] = poll.votes[studentId]![day] || {};
   (poll.votes[studentId]![day] as any)[meal] = option;
@@ -571,20 +762,28 @@ export function closeWeeklyPoll() {
   const poll = getActiveWeeklyPoll();
   if (!poll) return null;
   const menu: WeeklyMenu = Object.fromEntries(
-    WEEK_DAYS.map((d) => [d, Object.fromEntries(MEALS3.map((m) => {
-      const counts: Record<string, number> = {};
-      Object.values(poll.votes).forEach((perStudent) => {
-        const choice = (perStudent[d] || ({} as any))[m];
-        if (choice) counts[choice] = (counts[choice] || 0) + 1;
-      });
-      let best = poll.options[d][m][0];
-      let bestCount = -1;
-      for (const opt of poll.options[d][m]) {
-        const c = counts[opt] || 0;
-        if (c > bestCount) { best = opt; bestCount = c; }
-      }
-      return [m, best];
-    })) as Record<Meal3, string>])
+    WEEK_DAYS.map((d) => [
+      d,
+      Object.fromEntries(
+        MEALS3.map((m) => {
+          const counts: Record<string, number> = {};
+          Object.values(poll.votes).forEach((perStudent) => {
+            const choice = (perStudent[d] || ({} as any))[m];
+            if (choice) counts[choice] = (counts[choice] || 0) + 1;
+          });
+          let best = poll.options[d][m][0];
+          let bestCount = -1;
+          for (const opt of poll.options[d][m]) {
+            const c = counts[opt] || 0;
+            if (c > bestCount) {
+              best = opt;
+              bestCount = c;
+            }
+          }
+          return [m, best];
+        }),
+      ) as Record<Meal3, string>,
+    ]),
   ) as any;
 
   poll.open = false;
@@ -602,7 +801,10 @@ export function getWeeklyResults() {
   const target = poll || readWeeklyPolls().slice(-1)[0];
   if (!target) return null;
   const totals = Object.keys(target.votes).length || 0;
-  const result: Record<WeekDay, Record<Meal3, { option: string; percent: number }[]>> = {} as any;
+  const result: Record<
+    WeekDay,
+    Record<Meal3, { option: string; percent: number }[]>
+  > = {} as any;
   for (const d of WEEK_DAYS) {
     result[d] = {} as any;
     for (const m of MEALS3) {
@@ -611,7 +813,10 @@ export function getWeeklyResults() {
         const choice = (s[d] || ({} as any))[m];
         if (choice) counts[choice] = (counts[choice] || 0) + 1;
       });
-      result[d][m] = target.options[d][m].map((opt) => ({ option: opt, percent: totals ? Math.round(((counts[opt] || 0) / totals) * 100) : 0 }));
+      result[d][m] = target.options[d][m].map((opt) => ({
+        option: opt,
+        percent: totals ? Math.round(((counts[opt] || 0) / totals) * 100) : 0,
+      }));
     }
   }
   return { poll: target, result, totals };
@@ -623,9 +828,20 @@ export function getMenuForWeek(weekKey = weekStartKey()): WeeklyMenu | null {
 }
 
 // Daily meal attendance polls
-export function createDailyMealPoll(meal: MealSlot, { cutoffMinutes = 60, menuText = "" } = {}) {
+export function createDailyMealPoll(
+  meal: MealSlot,
+  { cutoffMinutes = 60, menuText = "" } = {},
+) {
   const dKey = dateKey();
-  const p: DailyMealPoll = { id: uid(), dateKey: dKey, meal, menuText, cutoffAt: Date.now() + cutoffMinutes * 60 * 1000, open: true, responses: {} };
+  const p: DailyMealPoll = {
+    id: uid(),
+    dateKey: dKey,
+    meal,
+    menuText,
+    cutoffAt: Date.now() + cutoffMinutes * 60 * 1000,
+    open: true,
+    responses: {},
+  };
   const polls = readDailyMealPolls();
   polls.push(p);
   writeDailyMealPolls(polls);
@@ -634,10 +850,16 @@ export function createDailyMealPoll(meal: MealSlot, { cutoffMinutes = 60, menuTe
 
 export function getActiveDailyMealPolls(forDate = dateKey()): DailyMealPoll[] {
   const now = Date.now();
-  return readDailyMealPolls().filter((p) => p.dateKey === forDate && p.open && now < p.cutoffAt);
+  return readDailyMealPolls().filter(
+    (p) => p.dateKey === forDate && p.open && now < p.cutoffAt,
+  );
 }
 
-export function respondDailyMeal(studentId: StudentId, pollId: string, value: "eating" | "not") {
+export function respondDailyMeal(
+  studentId: StudentId,
+  pollId: string,
+  value: "eating" | "not",
+) {
   const polls = readDailyMealPolls();
   const idx = polls.findIndex((p) => p.id === pollId);
   if (idx === -1) throw new Error("Poll not found");
@@ -660,9 +882,16 @@ export function listDailyPollsForDate(dKey = dateKey()) {
   return readDailyMealPolls().filter((p) => p.dateKey === dKey);
 }
 
-export function skippedMealsCount(studentId: StudentId, monthKey = new Date().toISOString().slice(0,7)) {
-  const polls = readDailyMealPolls().filter((p) => p.dateKey.startsWith(monthKey));
+export function skippedMealsCount(
+  studentId: StudentId,
+  monthKey = new Date().toISOString().slice(0, 7),
+) {
+  const polls = readDailyMealPolls().filter((p) =>
+    p.dateKey.startsWith(monthKey),
+  );
   let count = 0;
-  for (const p of polls) { if (p.responses[studentId] === "not") count++; }
+  for (const p of polls) {
+    if (p.responses[studentId] === "not") count++;
+  }
   return count;
 }
