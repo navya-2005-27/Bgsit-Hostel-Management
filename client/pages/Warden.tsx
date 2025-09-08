@@ -337,6 +337,52 @@ export default function Warden() {
             </div>
           </TabsContent>
 
+          {/* Complaints */}
+          <TabsContent value="complaints" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Complaint Dashboard</CardTitle>
+                <CardDescription>Review, prioritize by upvotes, and mark completed.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto rounded-md border">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="p-2">Complaint ID</th>
+                        <th className="p-2">Complaint Text</th>
+                        <th className="p-2">Category</th>
+                        <th className="p-2">Submitted</th>
+                        <th className="p-2">Upvotes</th>
+                        <th className="p-2">Status</th>
+                        <th className="p-2">Days Taken</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listComplaints().map((c) => (
+                        <tr key={c.id} className="border-t align-top">
+                          <td className="p-2 font-mono text-xs">{c.id.slice(-8)}</td>
+                          <td className="p-2 max-w-md">{c.text}</td>
+                          <td className="p-2">{c.category}</td>
+                          <td className="p-2">{new Date(c.submittedAt).toLocaleString()}</td>
+                          <td className="p-2">{c.upvotes}</td>
+                          <td className="p-2">
+                            {c.status === "pending" ? (
+                              <Button size="sm" onClick={() => { setComplaintStatus(c.id, "done"); }}>Mark Done ✅</Button>
+                            ) : (
+                              <Button size="sm" variant="outline" onClick={() => { setComplaintStatus(c.id, "pending"); }}>Reopen</Button>
+                            )}
+                          </td>
+                          <td className="p-2">{c.doneAt ? complaintDaysTaken(c) : "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Attendance */}
           <TabsContent value="attendance" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-3">
