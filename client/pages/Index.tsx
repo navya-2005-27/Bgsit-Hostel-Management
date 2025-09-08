@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import { GraduationCap, Shield, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 export default function Index() {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background to-white dark:to-background">
@@ -65,6 +67,7 @@ export default function Index() {
                 onClick={() => {
                   toast({ title: "Student login", description: "Proceeding as Student." });
                   setOpen(false);
+                  navigate("/student");
                 }}
               />
 
@@ -76,6 +79,7 @@ export default function Index() {
                 onClick={() => {
                   toast({ title: "Warden login", description: "Proceeding as Warden." });
                   setOpen(false);
+                  navigate("/warden");
                 }}
               />
             </div>
