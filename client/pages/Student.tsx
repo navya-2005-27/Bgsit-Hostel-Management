@@ -17,7 +17,10 @@ export default function Student() {
   const [dailyPolls, setDailyPolls] = useState(getActiveDailyMealPolls());
 
   useEffect(() => {
-    const i = setInterval(() => setNow(Date.now()), 1500);
+    const i = setInterval(() => {
+      setNow(Date.now());
+      setDailyPolls(getActiveDailyMealPolls());
+    }, 1500);
     return () => clearInterval(i);
   }, []);
   useEffect(() => {
