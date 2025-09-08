@@ -322,6 +322,66 @@ export function formatWhatsAppLink(phone: string, message: string) {
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }
 
+// -------------------- Payments (frontend-only demo) --------------------
+export type PaymentMethod = "cash" | "upi" | "online";
+export type Payment = {
+  id: string;
+  studentId: StudentId;
+  amount: number;
+  method: PaymentMethod;
+  dateISO: string;
+  note?: string;
+};
+
+const PAYMENTS_KEY = "campusstay.payments.v1";
+
+function readPayments(): Payment[] {
+  try { const raw = localStorage.getItem(PAYMENTS_KEY); return raw ? (JSON.parse(raw) as Payment[]) : []; } catch { return []; }
+}
+function writePayments(p: Payment[]) { localStorage.setItem(PAYMENTS_KEY, JSON.stringify(p)); }
+
+export function listPaymentsByStudent(studentId: StudentId): Payment[] {
+  return readPayments().filter((p) => p.studentId === studentId).sort((a,b)=>a.dateISO.localeCompare(b.dateISO));
+}
+
+export function addPayment(studentId: StudentId, amount: number, method: PaymentMethod, date = new Date(), note?: string): Payment {
+  const rec: Payment = { id: uid(), studentId, amount: Number(amount) || 0, method, dateISO: date.toISOString(), note };
+  const all = readPayments();
+  all.push(rec);
+  writePayments(all);
+  return rec;
+}
+
+export function paymentTotals(studentId: StudentId): { rent: number; paid: number; due: number } {
+  const s = getStudent(studentId);
+  const rent = s?.details.totalAmount ?? 0;
+  const paid = listPaymentsByStudent(studentId).reduce((sum, r) => sum + r.amount, 0);
+  const due = Math.max(0, (rent || 0) - paid);
+  return { rent: rent || 0, paid, due };
+}
+
+export type PaymentStatus = "paid" | "pending" | "overdue";
+export function computeStatus(t: { rent: number; paid: number; due: number }, overdueDay = 10): PaymentStatus {
+  if (t.due <= 0) return "paid";
+  const today = new Date();
+  return today.getDate() > overdueDay ? "overdue" : "pending";
+}
+
+export function paymentSummaryAll(): { id: StudentId; name: string; rent: number; paid: number; due: number; status: PaymentStatus }[] {
+  return listStudents().map((s) => {
+    const t = paymentTotals(s.id);
+    return { id: s.id, name: s.details.name, rent: t.rent, paid: t.paid, due: t.due, status: computeStatus(t) };
+  });
+}
+
+export function exportPaymentsCSV(): string {
+  const rows = ["Name,Total Rent,Total Paid,Total Due,Status"];
+  for (const row of paymentSummaryAll()) {
+    rows.push(`"${row.name}",${row.rent},${row.paid},${row.due},${row.status}`);
+  }
+  return rows.join("\n");
+}
+
 // -------------------- Mess Polling (frontend-only demo) --------------------
 export const WEEK_DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] as const;
 export type WeekDay = typeof WEEK_DAYS[number];
