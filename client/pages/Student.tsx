@@ -220,6 +220,26 @@ export default function Student() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Events</CardTitle>
+            <CardDescription>Browse and register for upcoming events. Comment to ask questions.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <EventFeed selectedId={selectedId as any} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Propose an Event</CardTitle>
+            <CardDescription>Submit for warden approval. Approved events appear in the feed.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EventProposalForm onSubmitted={() => setNow(Date.now())} />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
