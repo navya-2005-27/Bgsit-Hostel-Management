@@ -96,6 +96,8 @@ export default function Warden() {
     const i = setInterval(() => {
       setNow(Date.now());
       setSession(getActiveAttendanceSession());
+      setWeeklyActive(getActiveWeeklyPoll());
+      setActiveDayPolls(getActiveDailyMealPolls());
     }, 1000);
     return () => clearInterval(i);
   }, []);
