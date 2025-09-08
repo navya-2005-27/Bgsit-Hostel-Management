@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { paymentTotals, listPaymentsByStudent, COMPLAINT_CATEGORIES, createComplaint, listActiveComplaints, upvoteComplaint, hasUpvotedComplaint } from "@/lib/studentStore";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { listUpcoming as listUpcomingEvents, listPast as listPastEvents, registerForEvent, addEventComment, createEvent as createEventProposal } from "@/lib/eventStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ComplaintFeed } from "./components.complaints-feed";
