@@ -125,6 +125,69 @@ export default function Student() {
             {status ? (<div className="text-sm text-muted-foreground">{status}</div>) : null}
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Weekly Menu Poll</CardTitle>
+            <CardDescription>{weekly ? "Vote for each meal this week." : "No active weekly poll right now."}</CardDescription>
+          </CardHeader>
+          {weekly ? (
+            <CardContent>
+              <Tabs defaultValue={WEEK_DAYS[0]}>
+                <TabsList className="flex flex-wrap gap-1">
+                  {WEEK_DAYS.map((d) => (<TabsTrigger key={d} value={d}>{d}</TabsTrigger>))}
+                </TabsList>
+                {WEEK_DAYS.map((d) => (
+                  <TabsContent key={d} value={d} className="mt-4 grid gap-4 sm:grid-cols-3">
+                    {MEALS3.map((m) => (
+                      <div key={m} className="rounded-md border p-3">
+                        <div className="mb-2 text-sm font-medium">{m}</div>
+                        <RadioGroup onValueChange={(opt) => { if (selected) voteWeekly(d as any, m as any, opt, selected.id); }}>
+                          {weekly.options[d][m].map((opt) => (
+                            <label key={opt} className="flex items-center gap-2 text-sm">
+                              <RadioGroupItem value={opt} />
+                              <span>{opt}</span>
+                            </label>
+                          ))}
+                        </RadioGroup>
+                      </div>
+                    ))}
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </CardContent>
+          ) : null}
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Today's Meals</CardTitle>
+            <CardDescription>Eating / Not Eating</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {dailyPolls.length ? dailyPolls.map((p) => (
+              <div key={p.id} className="rounded-md border p-3 text-sm">
+                <div className="flex items-center justify-between"><span>{p.meal} {p.menuText ? `• ${p.menuText}` : ""}</span><span className="text-muted-foreground">Cutoff {new Date(p.cutoffAt).toLocaleTimeString()}</span></div>
+                <div className="mt-2 flex gap-2">
+                  <Button size="sm" onClick={() => { if (selected) respondDailyMeal(selected.id, p.id, "eating"); }}>Eating</Button>
+                  <Button size="sm" variant="outline" onClick={() => { if (selected) respondDailyMeal(selected.id, p.id, "not"); }}>Not Eating</Button>
+                </div>
+              </div>
+            )) : <div className="text-sm text-muted-foreground">No active meal polls yet.</div>}
+          </CardContent>
+        </Card>
+
+        {selected ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Skipped Meals This Month</CardTitle>
+              <CardDescription>Auto-calculated from your responses.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{skippedMealsCount(selected.id)}</div>
+            </CardContent>
+          </Card>
+        ) : null}
       </div>
     </div>
   );
