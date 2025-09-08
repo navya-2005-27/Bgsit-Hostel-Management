@@ -382,6 +382,89 @@ export function exportPaymentsCSV(): string {
   return rows.join("\n");
 }
 
+// -------------------- Complaints (frontend-only demo) --------------------
+export const COMPLAINT_CATEGORIES = [
+  "Food",
+  "Room",
+  "Cleanliness",
+  "Electricity",
+  "Water",
+  "Other",
+] as const;
+export type ComplaintCategory = typeof COMPLAINT_CATEGORIES[number];
+export type ComplaintStatus = "pending" | "done";
+export type Complaint = {
+  id: string;
+  text: string;
+  category: ComplaintCategory;
+  submittedAt: string; // ISO
+  upvotes: number;
+  status: ComplaintStatus;
+  doneAt?: string; // ISO
+};
+
+const COMPLAINTS_KEY = "campusstay.complaints.v1";
+const COMPLAINT_UPVOTED_IDS_KEY = "campusstay.complaints.upvoted.ids.v1"; // device-level safeguard
+
+function readComplaints(): Complaint[] {
+  try { const raw = localStorage.getItem(COMPLAINTS_KEY); return raw ? (JSON.parse(raw) as Complaint[]) : []; } catch { return []; }
+}
+function writeComplaints(c: Complaint[]) { localStorage.setItem(COMPLAINTS_KEY, JSON.stringify(c)); }
+
+function readUpvotedIds(): Set<string> {
+  try { const raw = localStorage.getItem(COMPLAINT_UPVOTED_IDS_KEY); return new Set(raw ? (JSON.parse(raw) as string[]) : []); } catch { return new Set(); }
+}
+function writeUpvotedIds(set: Set<string>) { localStorage.setItem(COMPLAINT_UPVOTED_IDS_KEY, JSON.stringify(Array.from(set))); }
+
+export function createComplaint(text: string, category: ComplaintCategory): Complaint {
+  const c: Complaint = { id: uid(), text: text.trim(), category, submittedAt: new Date().toISOString(), upvotes: 0, status: "pending" };
+  const all = readComplaints();
+  all.push(c);
+  writeComplaints(all);
+  return c;
+}
+
+export function listComplaints(): Complaint[] {
+  const all = readComplaints();
+  // sort by upvotes desc, then newest
+  return all.sort((a, b) => (b.upvotes - a.upvotes) || b.submittedAt.localeCompare(a.submittedAt));
+}
+export function listActiveComplaints(): Complaint[] {
+  return listComplaints().filter((c) => c.status === "pending");
+}
+
+export function hasUpvotedComplaint(id: string): boolean {
+  return readUpvotedIds().has(id);
+}
+
+export function upvoteComplaint(id: string) {
+  const ids = readUpvotedIds();
+  if (ids.has(id)) return; // already upvoted on this device
+  const all = readComplaints();
+  const idx = all.findIndex((c) => c.id === id);
+  if (idx === -1) return;
+  all[idx] = { ...all[idx], upvotes: all[idx].upvotes + 1 };
+  writeComplaints(all);
+  ids.add(id);
+  writeUpvotedIds(ids);
+}
+
+export function setComplaintStatus(id: string, status: ComplaintStatus) {
+  const all = readComplaints();
+  const idx = all.findIndex((c) => c.id === id);
+  if (idx === -1) return;
+  const doneAt = status === "done" ? new Date().toISOString() : undefined;
+  all[idx] = { ...all[idx], status, doneAt };
+  writeComplaints(all);
+}
+
+export function complaintDaysTaken(c: Complaint): number {
+  if (!c.doneAt) return 0;
+  const start = new Date(c.submittedAt).getTime();
+  const end = new Date(c.doneAt).getTime();
+  return Math.max(0, Math.ceil((end - start) / (24 * 60 * 60 * 1000)));
+}
+
 // -------------------- Mess Polling (frontend-only demo) --------------------
 export const WEEK_DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] as const;
 export type WeekDay = typeof WEEK_DAYS[number];
