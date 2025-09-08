@@ -58,6 +58,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { PaymentsOverview, StudentPaymentPanel } from "./components.payments";
+import { createEvent as createEventRecord, approveEvent, rejectEvent, completeEvent, listPendingProposals as listEventProposals, listEvents as listAllEvents, eventAnalytics } from "@/lib/eventStore";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Warden() {
