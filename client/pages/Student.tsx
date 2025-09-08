@@ -22,6 +22,9 @@ export default function Student() {
   const [status, setStatus] = useState<string>("");
   const weekly = getActiveWeeklyPoll();
   const [dailyPolls, setDailyPolls] = useState(getActiveDailyMealPolls());
+  // Login state
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     const i = setInterval(() => {
