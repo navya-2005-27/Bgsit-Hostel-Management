@@ -191,6 +191,33 @@ export default function Student() {
             </CardContent>
           </Card>
         ) : null}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Anonymous Complaints</CardTitle>
+            <CardDescription>Submit without your name. Upvote issues you also face.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <form className="space-y-2" onSubmit={(e) => { e.preventDefault(); const form = e.currentTarget as HTMLFormElement; const t = (form.elements.namedItem('complaintText') as HTMLTextAreaElement).value.trim(); const c = (form.elements.namedItem('complaintCategory') as HTMLSelectElement).value as any; if (!t) return; createComplaint(t, c); (form.reset) && form.reset(); setDailyPolls(getActiveDailyMealPolls()); setStudents(listStudents()); setNow(Date.now()); }}>
+              <div>
+                <Label>Complaint Text</Label>
+                <Textarea name="complaintText" placeholder="Describe the issue" />
+              </div>
+              <div>
+                <Label>Category</Label>
+                <select name="complaintCategory" className="w-full rounded-md border bg-background px-2 py-2">
+                  {COMPLAINT_CATEGORIES.map((c) => (<option key={c} value={c}>{c}</option>))}
+                </select>
+              </div>
+              <Button type="submit">Submit</Button>
+            </form>
+
+            <div className="pt-2">
+              <div className="mb-2 text-sm font-medium">Complaint Feed</div>
+              <ComplaintFeed />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
