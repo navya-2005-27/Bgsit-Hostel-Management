@@ -306,6 +306,31 @@ export default function Warden() {
             </div>
           </TabsContent>
 
+          {/* Payments */}
+          <TabsContent value="payments" className="mt-6">
+            <div className="grid gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle>Payments Dashboard</CardTitle>
+                  <CardDescription>View all students and filter by payment status. Export as CSV or print.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PaymentsOverview />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Student Report</CardTitle>
+                  <CardDescription>Add or update payments, view history.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <StudentPaymentPanel students={students} />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Attendance */}
           <TabsContent value="attendance" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-3">
