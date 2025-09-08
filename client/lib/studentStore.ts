@@ -51,6 +51,26 @@ export function getStudent(id: StudentId): StudentRecord | undefined {
   return readAll().find((s) => s.id === id);
 }
 
+export function findStudentByUsername(username: string): StudentRecord | undefined {
+  const u = username.trim().toLowerCase();
+  return readAll().find((s) => s.credentials?.username.toLowerCase() === u);
+}
+
+const SESSION_KEY = "campusstay.session.studentId.v1";
+export function authenticateStudent(username: string, password: string): StudentRecord | null {
+  const s = findStudentByUsername(username);
+  if (!s || !s.credentials) return null;
+  if (s.credentials.password !== password) return null;
+  localStorage.setItem(SESSION_KEY, s.id);
+  return s;
+}
+export function getCurrentStudentId(): StudentId | null {
+  return localStorage.getItem(SESSION_KEY) as StudentId | null;
+}
+export function logoutStudent() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
 export function upsertStudent(record: StudentRecord): StudentRecord {
   const all = readAll();
   const idx = all.findIndex((s) => s.id === record.id);
@@ -113,6 +133,11 @@ export function updateDetails(id: StudentId, patch: Partial<StudentDetails>) {
   if (idx === -1) throw new Error("Student not found");
   all[idx] = { ...all[idx], details: { ...all[idx].details, ...patch } };
   writeAll(all);
+  const current = getCurrentStudentId();
+  if (current === id) {
+    // keep session id intact
+    localStorage.setItem(SESSION_KEY, id);
+  }
 }
 
 export function importFilesToDataUrls(files: FileList | File[]): Promise<{ name: string; dataUrl: string }[]> {
