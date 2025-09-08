@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { listStudents, getStudentPublic, StudentId, getActiveAttendanceSession, markAttendanceWithToken, // Mess
-  getActiveWeeklyPoll, WEEK_DAYS, MEALS3, voteWeekly, getActiveDailyMealPolls, respondDailyMeal, MEAL_SLOTS, skippedMealsCount } from "@/lib/studentStore";
+  getActiveWeeklyPoll, WEEK_DAYS, MEALS3, voteWeekly, getActiveDailyMealPolls, respondDailyMeal, MEAL_SLOTS, skippedMealsCount, authenticateStudent, getCurrentStudentId, logoutStudent } from "@/lib/studentStore";
 import { Button } from "@/components/ui/button";
 import { paymentTotals, listPaymentsByStudent, COMPLAINT_CATEGORIES, createComplaint, listActiveComplaints, upvoteComplaint, hasUpvotedComplaint } from "@/lib/studentStore";
 import { Textarea } from "@/components/ui/textarea";
