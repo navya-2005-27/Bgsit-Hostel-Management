@@ -44,6 +44,12 @@ import {
   closeDailyMealPoll,
   MEAL_SLOTS,
   skippedMealsCount,
+  // Payments
+  paymentSummaryAll,
+  addPayment,
+  listPaymentsByStudent,
+  paymentTotals,
+  exportPaymentsCSV,
 } from "@/lib/studentStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
