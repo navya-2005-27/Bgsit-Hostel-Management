@@ -46,6 +46,7 @@ import {
   skippedMealsCount,
 } from "@/lib/studentStore";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Warden() {
