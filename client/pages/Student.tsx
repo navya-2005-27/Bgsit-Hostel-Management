@@ -11,6 +11,7 @@ import { listUpcoming as listUpcomingEvents, listPast as listPastEvents, registe
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ComplaintFeed } from "./components.complaints-feed";
+import { EventFeed, EventProposalForm } from "./components.events.student";
 
 export default function Student() {
   const [students, setStudents] = useState(listStudents());
