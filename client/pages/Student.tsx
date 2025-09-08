@@ -27,6 +27,8 @@ export default function Student() {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
+    const current = getCurrentStudentId();
+    if (current) setSelectedId(current);
     const i = setInterval(() => {
       setNow(Date.now());
       setDailyPolls(getActiveDailyMealPolls());
