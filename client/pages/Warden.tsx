@@ -218,6 +218,7 @@ export default function Warden() {
             <TabsTrigger value="mess">Mess Management</TabsTrigger>
             <TabsTrigger value="attendance">Attendance Management</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="complaints">Complaints</TabsTrigger>
             <TabsTrigger value="account">Student Account Management</TabsTrigger>
             <TabsTrigger value="details">Add Member Details</TabsTrigger>
           </TabsList>
