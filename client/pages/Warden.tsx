@@ -221,6 +221,7 @@ export default function Warden() {
         <Tabs defaultValue="mess" className="w-full">
           <TabsList>
             <TabsTrigger value="mess">Mess Management</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="attendance">Attendance Management</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
             <TabsTrigger value="complaints">Complaints</TabsTrigger>
