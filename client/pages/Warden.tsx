@@ -206,7 +206,7 @@ export default function Warden() {
           <h1 className="text-2xl font-bold">Warden Section</h1>
         </div>
 
-        <Tabs defaultValue="attendance" className="w-full">
+        <Tabs defaultValue="mess" className="w-full">
           <TabsList>
             <TabsTrigger value="attendance">Attendance Management</TabsTrigger>
             <TabsTrigger value="account">Student Account Management</TabsTrigger>
