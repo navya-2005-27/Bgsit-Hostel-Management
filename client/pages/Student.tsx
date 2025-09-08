@@ -13,6 +13,8 @@ export default function Student() {
   const [now, setNow] = useState(Date.now());
   const [token, setToken] = useState("");
   const [status, setStatus] = useState<string>("");
+  const weekly = getActiveWeeklyPoll();
+  const [dailyPolls, setDailyPolls] = useState(getActiveDailyMealPolls());
 
   useEffect(() => {
     const i = setInterval(() => setNow(Date.now()), 1500);
