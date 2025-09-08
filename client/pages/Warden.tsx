@@ -314,6 +314,44 @@ export default function Warden() {
             </div>
           </TabsContent>
 
+          {/* Events */}
+          <TabsContent value="events" className="mt-6">
+            <div className="grid gap-6 lg:grid-cols-3">
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle>Create Event</CardTitle>
+                  <CardDescription>Warden can create events directly. Students will see approved events in feed.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <EventCreator />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Proposals & Analytics</CardTitle>
+                  <CardDescription>Approve/reject student proposals. See participation insights.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <EventProposals />
+                  <div className="mt-4">
+                    <EventAnalytics />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="lg:col-span-3">
+                <CardHeader>
+                  <CardTitle>All Events</CardTitle>
+                  <CardDescription>Manage status and view participants.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <AllEventsTable />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
           {/* Payments */}
           <TabsContent value="payments" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-3">
