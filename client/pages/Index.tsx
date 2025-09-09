@@ -30,7 +30,7 @@ export default function Index() {
       <img
         src="https://cdn.builder.io/api/v1/image/assets%2F899b01c40c4f484a80794cbef47f0df5%2F56d4ed04cae048d9944acd5edaba922c?format=webp&width=1600"
         alt="BGSIT campus"
-        className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover blur-[1px] brightness-100 dark:brightness-75 scale-105"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover blur-[0.5px] brightness-100 dark:brightness-75 scale-105"
       />
       {/* Background decorations */}
       <div
