@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { listStudents } from "@/lib/studentStore";
+import { listStudents, getStudentPublic } from "@/lib/studentStore";
 import { createParcel, listPendingParcels, listAllParcels, markCollectedWithOtp, deleteParcel } from "@/lib/parcelStore";
 
 export function WardenParcelsPanel() {
