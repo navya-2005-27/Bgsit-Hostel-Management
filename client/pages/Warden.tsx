@@ -99,6 +99,7 @@ import {
 } from "@/lib/eventStore";
 import { useToast } from "@/hooks/use-toast";
 import { WardenRoomsPanel } from "./components.rooms.warden";
+import { WardenParcelsPanel } from "./components.parcels.warden";
 
 export default function Warden() {
   const { toast } = useToast();
