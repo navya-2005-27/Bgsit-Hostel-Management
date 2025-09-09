@@ -42,6 +42,7 @@ import { EventFeed, EventProposalForm } from "./components.events.student";
 import { StudentIDCard } from "./components.student-id";
 import { Input } from "@/components/ui/input";
 import { StudentRoomsPanel } from "./components.rooms.student";
+import { StudentParcelsPanel } from "./components.parcels.student";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Student() {
@@ -156,6 +157,9 @@ export default function Student() {
             </TabsTrigger>
             <TabsTrigger value="rooms" className="rounded-full">
               Rooms
+            </TabsTrigger>
+            <TabsTrigger value="parcels" className="rounded-full">
+              Parcels
             </TabsTrigger>
           </TabsList>
 
@@ -448,6 +452,10 @@ export default function Student() {
               studentId={selectedId}
               onUpdated={() => setNow(Date.now())}
             />
+          </TabsContent>
+
+          <TabsContent value="parcels" className="mt-6">
+            <StudentParcelsPanel studentId={selectedId} />
           </TabsContent>
 
           <TabsContent value="complaints" className="mt-6">
