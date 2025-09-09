@@ -10,24 +10,29 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Warden from "./pages/Warden";
 import Student from "./pages/Student";
+import { ThemeProvider } from "next-themes";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/warden" element={<Warden />} />
-          <Route path="/student" element={<Student />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ThemeToggle />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/warden" element={<Warden />} />
+            <Route path="/student" element={<Student />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
