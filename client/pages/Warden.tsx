@@ -695,7 +695,9 @@ export default function Warden() {
                             variant="outline"
                             onClick={async () => {
                               try {
-                                await navigator.clipboard.writeText(session.token);
+                                await navigator.clipboard.writeText(
+                                  session.token,
+                                );
                                 alert("Token copied");
                               } catch {
                                 alert("Copy failed. Select and copy manually.");
@@ -764,21 +766,25 @@ export default function Warden() {
                       />
                     </div>
                     <div className="mt-2 grid grid-cols-2 gap-2">
-                      <Button
-                        onClick={saveSettings}
-                        variant="outline"
-                      >
+                      <Button onClick={saveSettings} variant="outline">
                         Save Geofence
                       </Button>
                       <Button
                         variant="secondary"
                         onClick={async () => {
                           try {
-                            const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
-                              navigator.geolocation.getCurrentPosition(resolve, reject)
+                            const pos = await new Promise<GeolocationPosition>(
+                              (resolve, reject) =>
+                                navigator.geolocation.getCurrentPosition(
+                                  resolve,
+                                  reject,
+                                ),
                             );
                             setSettings({
-                              center: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+                              center: {
+                                lat: pos.coords.latitude,
+                                lng: pos.coords.longitude,
+                              },
                               radiusM: settings?.radiusM ?? 50,
                             });
                           } catch {

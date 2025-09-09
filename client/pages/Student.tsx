@@ -44,7 +44,15 @@ import { Input } from "@/components/ui/input";
 import { StudentRoomsPanel } from "./components.rooms.student";
 import { StudentParcelsPanel } from "./components.parcels.student";
 import { useEffect, useMemo, useState } from "react";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Student() {
   const [students, setStudents] = useState(listStudents());
@@ -57,7 +65,11 @@ export default function Student() {
   // Login state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [geoDialog, setGeoDialog] = useState<{ open: boolean; title: string; desc?: string }>({ open: false, title: "", desc: "" });
+  const [geoDialog, setGeoDialog] = useState<{
+    open: boolean;
+    title: string;
+    desc?: string;
+  }>({ open: false, title: "", desc: "" });
 
   useEffect(() => {
     const current = getCurrentStudentId();
@@ -554,16 +566,29 @@ export default function Student() {
           </TabsContent>
         </Tabs>
 
-        <AlertDialog open={geoDialog.open} onOpenChange={(o) => setGeoDialog((s) => ({ ...s, open: o }))}>
+        <AlertDialog
+          open={geoDialog.open}
+          onOpenChange={(o) => setGeoDialog((s) => ({ ...s, open: o }))}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{geoDialog.title || "Location required"}</AlertDialogTitle>
+              <AlertDialogTitle>
+                {geoDialog.title || "Location required"}
+              </AlertDialogTitle>
               {geoDialog.desc ? (
-                <AlertDialogDescription>{geoDialog.desc}</AlertDialogDescription>
+                <AlertDialogDescription>
+                  {geoDialog.desc}
+                </AlertDialogDescription>
               ) : null}
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogAction onClick={() => setGeoDialog({ open: false, title: "", desc: "" })}>OK</AlertDialogAction>
+              <AlertDialogAction
+                onClick={() =>
+                  setGeoDialog({ open: false, title: "", desc: "" })
+                }
+              >
+                OK
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
