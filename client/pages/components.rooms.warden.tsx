@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { listRooms, createRoom, setRoomCapacity, deleteRoom, availableSeats, resetAllBookings, listRequests, approveRequest, rejectRequest } from "@/lib/roomStore";
-import { listStudents, getStudentPublic } from "@/lib/studentStore";
+import { getStudentPublic } from "@/lib/studentStore";
 
 export function WardenRoomsPanel() {
   const [now, setNow] = useState(Date.now());
