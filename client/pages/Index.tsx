@@ -38,16 +38,13 @@ export default function Index() {
       />
 
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col items-center justify-center px-6 text-center">
-        <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1 text-xs font-semibold tracking-wide text-primary">
+        <span className="hidden mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1 text-xs font-semibold tracking-wide text-primary">
           <Sparkles className="h-3.5 w-3.5" /> Welcome to CampusStay
         </span>
-        <h1 className="mx-auto max-w-3xl text-pretty text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl">
-          A stylish modern portal for your hostel
-          <span className="bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
-            {" "}
-            access
-          </span>
+        <h1 className="mx-auto max-w-4xl text-pretty text-5xl font-extrabold tracking-tight text-foreground sm:text-6xl">
+          BGSIT-Hostel-Management
         </h1>
+        <div className="hidden bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-500 bg-clip-text font-extrabold"></div>
         <p className="mx-auto mt-5 max-w-2xl text-balance text-lg text-muted-foreground">
           Seamless entry for students. Powerful controls for wardens.
           Beautifully crafted for speed and clarity.
@@ -107,7 +104,7 @@ export default function Index() {
         </Dialog>
 
         {/* Subtle footer note */}
-        <p className="mt-14 text-xs text-muted-foreground/80">
+        <p className="hidden mt-14 text-xs text-muted-foreground/80">
           CampusStay • Crafted with care
         </p>
       </main>
