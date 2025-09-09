@@ -30,15 +30,15 @@ export default function Index() {
       <img
         src="https://cdn.builder.io/api/v1/image/assets%2F899b01c40c4f484a80794cbef47f0df5%2F56d4ed04cae048d9944acd5edaba922c?format=webp&width=1600"
         alt="BGSIT campus"
-        className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover blur-[1.5px] brightness-95 dark:brightness-75 scale-105"
+        className="pointer-events-none absolute inset-0 -z-10 h-full w-full object-cover blur-[1px] brightness-100 dark:brightness-75 scale-105"
       />
       {/* Background decorations */}
       <div
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_50%_-10%,hsl(var(--primary)/0.12),transparent)]"
+        className="pointer-events-none absolute inset-0 -z-30 bg-[radial-gradient(1200px_600px_at_50%_-10%,hsl(var(--primary)/0.12),transparent)]"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(0,0,0,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.06)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_75%)]"
+        className="pointer-events-none absolute inset-0 -z-30 bg-[linear-gradient(to_right,rgba(0,0,0,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.06)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_75%)]"
         aria-hidden="true"
       />
 
