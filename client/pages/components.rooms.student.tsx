@@ -20,8 +20,6 @@ export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: Student
     return <div className="text-sm text-muted-foreground">Login to book a room.</div>;
   }
 
-  const students = listStudents();
-
   if (bookedRoom) {
     const roommates = bookedRoom.occupants.filter((id) => id !== studentId);
     return (
