@@ -114,7 +114,7 @@ export function WardenParcelsPanel() {
                   {all.map((p) => (
                     <tr key={p.id} className="border-t">
                       <td className="p-2">{p.parcelCode}</td>
-                      <td className="p-2">{p.studentId}</td>
+                      <td className="p-2">{getStudentPublic(p.studentId)?.details.name || p.studentId}</td>
                       <td className="p-2">{new Date(p.receivedAt).toLocaleString()}</td>
                       <td className="p-2">{p.collected ? `Collected at ${new Date(p.collectedAt!).toLocaleString()}` : "Pending"}</td>
                     </tr>
