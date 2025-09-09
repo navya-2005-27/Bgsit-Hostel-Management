@@ -33,7 +33,13 @@ function genOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export function createParcel(studentId: StudentId, parcelCode: string, carrier?: string, receivedAt = Date.now(), note?: string): Parcel {
+export function createParcel(
+  studentId: StudentId,
+  parcelCode: string,
+  carrier?: string,
+  receivedAt = Date.now(),
+  note?: string,
+): Parcel {
   const p: Parcel = {
     id: uid(),
     studentId,
@@ -60,7 +66,10 @@ export function listParcelsByStudent(studentId: StudentId): Parcel[] {
   return listAllParcels().filter((p) => p.studentId === studentId);
 }
 
-export function markCollectedWithOtp(id: ParcelId, otp: string): { ok: true } | { ok: false; error: string } {
+export function markCollectedWithOtp(
+  id: ParcelId,
+  otp: string,
+): { ok: true } | { ok: false; error: string } {
   const all = read();
   const idx = all.findIndex((p) => p.id === id);
   if (idx === -1) return { ok: false, error: "Parcel not found" };
