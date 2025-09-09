@@ -27,6 +27,11 @@ export default function Index() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background to-white dark:to-background">
+      <img
+        src="https://cdn.builder.io/api/v1/image/assets%2F899b01c40c4f484a80794cbef47f0df5%2F256f9f962f3d4ca6981c227691a3e6fe?format=webp&width=1600"
+        alt="BGSIT campus"
+        className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover blur-[2px] brightness-95 dark:brightness-75 scale-105"
+      />
       {/* Background decorations */}
       <div
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_50%_-10%,hsl(var(--primary)/0.12),transparent)]"
