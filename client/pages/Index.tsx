@@ -50,9 +50,10 @@ export default function Index() {
           BGSIT-Hostel-Management
         </h1>
         <div className="hidden bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-500 bg-clip-text font-extrabold"></div>
-        <p className="mx-auto mt-5 max-w-2xl text-balance text-lg text-muted-foreground">
-          Seamless entry for students. Powerful controls for wardens.
-          Beautifully crafted for speed and clarity.
+        <p className="mx-auto mt-5 max-w-2xl text-balance text-lg">
+          <span className="text-black dark:text-white">
+            Seamless entry for students. Powerful controls for wardens. Beautifully crafted for speed and clarity.
+          </span>
         </p>
 
         <Dialog open={open} onOpenChange={setOpen}>
