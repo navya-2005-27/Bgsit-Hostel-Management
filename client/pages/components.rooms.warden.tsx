@@ -59,9 +59,13 @@ export function WardenRoomsPanel() {
             <Button
               onClick={() => {
                 if (!roomName.trim()) return;
-                createRoom(roomName.trim(), Math.max(1, capacity));
-                setRoomName("");
-                setNow(Date.now());
+                try {
+                  createRoom(roomName.trim(), Math.max(1, capacity));
+                  setRoomName("");
+                  setNow(Date.now());
+                } catch (e: any) {
+                  alert(e?.message || "Failed to add room");
+                }
               }}
             >
               Add Room
