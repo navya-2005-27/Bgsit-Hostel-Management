@@ -52,7 +52,8 @@ export default function Index() {
         <div className="hidden bg-gradient-to-r from-primary via-fuchsia-500 to-cyan-500 bg-clip-text font-extrabold"></div>
         <p className="mx-auto mt-5 max-w-2xl text-balance text-lg">
           <span className="text-black dark:text-white">
-            Seamless entry for students. Powerful controls for wardens. Beautifully crafted for speed and clarity.
+            Seamless entry for students. Powerful controls for wardens.
+            Beautifully crafted for speed and clarity.
           </span>
         </p>
 

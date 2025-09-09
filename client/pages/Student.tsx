@@ -164,7 +164,8 @@ export default function Student() {
               <CardHeader>
                 <CardTitle>Student Login</CardTitle>
                 <CardDescription>
-                  Sign in with your roll number and password provided by the warden.
+                  Sign in with your roll number and password provided by the
+                  warden.
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
@@ -443,7 +444,10 @@ export default function Student() {
           </TabsContent>
 
           <TabsContent value="rooms" className="mt-6">
-            <StudentRoomsPanel studentId={selectedId} onUpdated={() => setNow(Date.now())} />
+            <StudentRoomsPanel
+              studentId={selectedId}
+              onUpdated={() => setNow(Date.now())}
+            />
           </TabsContent>
 
           <TabsContent value="complaints" className="mt-6">

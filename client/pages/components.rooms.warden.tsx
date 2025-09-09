@@ -1,8 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { listRooms, createRoom, setRoomCapacity, deleteRoom, availableSeats, resetAllBookings, listRequests, approveRequest, rejectRequest } from "@/lib/roomStore";
+import {
+  listRooms,
+  createRoom,
+  setRoomCapacity,
+  deleteRoom,
+  availableSeats,
+  resetAllBookings,
+  listRequests,
+  approveRequest,
+  rejectRequest,
+} from "@/lib/roomStore";
 import { getStudentPublic } from "@/lib/studentStore";
 
 export function WardenRoomsPanel() {
@@ -23,12 +39,23 @@ export function WardenRoomsPanel() {
       <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Rooms & Allotments</CardTitle>
-          <CardDescription>Add rooms, view seats, and reset bookings.</CardDescription>
+          <CardDescription>
+            Add rooms, view seats, and reset bookings.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-2">
-            <Input placeholder="Room name (e.g. A-101)" value={roomName} onChange={(e) => setRoomName(e.target.value)} />
-            <Input type="number" placeholder="Capacity" value={capacity} onChange={(e) => setCapacity(Number(e.target.value || 2))} />
+            <Input
+              placeholder="Room name (e.g. A-101)"
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+            />
+            <Input
+              type="number"
+              placeholder="Capacity"
+              value={capacity}
+              onChange={(e) => setCapacity(Number(e.target.value || 2))}
+            />
             <Button
               onClick={() => {
                 if (!roomName.trim()) return;
@@ -47,20 +74,44 @@ export function WardenRoomsPanel() {
                 <div key={r.id} className="rounded-md border p-3 text-sm">
                   <div className="flex items-center justify-between">
                     <div className="font-medium">{r.name}</div>
-                    <Button size="sm" variant="outline" onClick={() => { deleteRoom(r.id); setNow(Date.now()); }}>Delete</Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        deleteRoom(r.id);
+                        setNow(Date.now());
+                      }}
+                    >
+                      Delete
+                    </Button>
                   </div>
                   <div className="mt-1">Capacity: {r.capacity}</div>
                   <div>Available: {availableSeats(r.id)}</div>
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Set capacity</span>
-                    <Input type="number" className="h-8 w-20" defaultValue={r.capacity} onBlur={(e) => { setRoomCapacity(r.id, Number(e.target.value || r.capacity)); setNow(Date.now()); }} />
+                    <span className="text-xs text-muted-foreground">
+                      Set capacity
+                    </span>
+                    <Input
+                      type="number"
+                      className="h-8 w-20"
+                      defaultValue={r.capacity}
+                      onBlur={(e) => {
+                        setRoomCapacity(
+                          r.id,
+                          Number(e.target.value || r.capacity),
+                        );
+                        setNow(Date.now());
+                      }}
+                    />
                   </div>
                   <div className="mt-2">
                     <div className="text-xs font-medium">Occupants</div>
                     {r.occupants.length ? (
                       <ul className="list-disc pl-5">
                         {r.occupants.map((id) => (
-                          <li key={id}>{getStudentPublic(id)?.details.name || id}</li>
+                          <li key={id}>
+                            {getStudentPublic(id)?.details.name || id}
+                          </li>
                         ))}
                       </ul>
                     ) : (
@@ -74,33 +125,73 @@ export function WardenRoomsPanel() {
             )}
           </div>
 
-          <Button variant="destructive" onClick={() => { if (confirm("Reset all bookings?")) { resetAllBookings(); setNow(Date.now()); } }}>Reset All Bookings</Button>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (confirm("Reset all bookings?")) {
+                resetAllBookings();
+                setNow(Date.now());
+              }
+            }}
+          >
+            Reset All Bookings
+          </Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Requests</CardTitle>
-          <CardDescription>Approve or reject leave/change requests.</CardDescription>
+          <CardDescription>
+            Approve or reject leave/change requests.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {requests.length ? (
             requests.map((rq) => {
               const s = getStudentPublic(rq.studentId);
-              const target = rq.targetRoomId ? listRooms().find((x) => x.id === rq.targetRoomId) : null;
+              const target = rq.targetRoomId
+                ? listRooms().find((x) => x.id === rq.targetRoomId)
+                : null;
               return (
                 <div key={rq.id} className="rounded-md border p-3 text-sm">
-                  <div className="font-medium">{s?.details.name || rq.studentId}</div>
-                  <div className="text-xs text-muted-foreground">{rq.type === "leave" ? "Leave room" : `Change to ${target?.name || rq.targetRoomId}`}</div>
+                  <div className="font-medium">
+                    {s?.details.name || rq.studentId}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {rq.type === "leave"
+                      ? "Leave room"
+                      : `Change to ${target?.name || rq.targetRoomId}`}
+                  </div>
                   <div className="mt-2 flex gap-2">
-                    <Button size="sm" onClick={() => { const res = approveRequest(rq.id); if (!res.ok) alert(res.error); setNow(Date.now()); }}>Approve</Button>
-                    <Button size="sm" variant="outline" onClick={() => { rejectRequest(rq.id); setNow(Date.now()); }}>Reject</Button>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const res = approveRequest(rq.id);
+                        if (!res.ok) alert(res.error);
+                        setNow(Date.now());
+                      }}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        rejectRequest(rq.id);
+                        setNow(Date.now());
+                      }}
+                    >
+                      Reject
+                    </Button>
                   </div>
                 </div>
               );
             })
           ) : (
-            <div className="text-sm text-muted-foreground">No pending requests</div>
+            <div className="text-sm text-muted-foreground">
+              No pending requests
+            </div>
           )}
 
           <div className="pt-2">
@@ -110,19 +201,35 @@ export function WardenRoomsPanel() {
                 .filter((r) => r.status !== "pending")
                 .map((rq) => {
                   const s = getStudentPublic(rq.studentId);
-                  const target = rq.targetRoomId ? listRooms().find((x) => x.id === rq.targetRoomId) : null;
+                  const target = rq.targetRoomId
+                    ? listRooms().find((x) => x.id === rq.targetRoomId)
+                    : null;
                   return (
                     <div key={rq.id} className="rounded-md border p-3 text-xs">
                       <div className="flex items-center justify-between">
                         <span>{s?.details.name || rq.studentId}</span>
-                        <span className={rq.status === "approved" ? "text-emerald-600" : "text-red-600"}>{rq.status}</span>
+                        <span
+                          className={
+                            rq.status === "approved"
+                              ? "text-emerald-600"
+                              : "text-red-600"
+                          }
+                        >
+                          {rq.status}
+                        </span>
                       </div>
-                      <div className="text-muted-foreground">{rq.type === "leave" ? "Leave room" : `Change to ${target?.name || rq.targetRoomId}`}</div>
+                      <div className="text-muted-foreground">
+                        {rq.type === "leave"
+                          ? "Leave room"
+                          : `Change to ${target?.name || rq.targetRoomId}`}
+                      </div>
                     </div>
                   );
                 })
             ) : (
-              <div className="text-xs text-muted-foreground">No history yet.</div>
+              <div className="text-xs text-muted-foreground">
+                No history yet.
+              </div>
             )}
           </div>
         </CardContent>

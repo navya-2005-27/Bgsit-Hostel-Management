@@ -59,7 +59,12 @@ export function listRooms(): Room[] {
 }
 
 export function createRoom(name: string, capacity = 2): Room {
-  const room: Room = { id: uid(), name: name.trim(), capacity: Math.max(1, capacity), occupants: [] };
+  const room: Room = {
+    id: uid(),
+    name: name.trim(),
+    capacity: Math.max(1, capacity),
+    occupants: [],
+  };
   const all = readRooms();
   all.push(room);
   writeRooms(all);
@@ -102,7 +107,10 @@ export function resetAllBookings() {
   writeRooms(all);
 }
 
-export function bookRoom(studentId: StudentId, roomId: RoomId): { room: Room; roommates: StudentId[] } {
+export function bookRoom(
+  studentId: StudentId,
+  roomId: RoomId,
+): { room: Room; roommates: StudentId[] } {
   const all = readRooms();
   const current = findStudentRoom(studentId);
   if (current) throw new Error("Student already has a room");
@@ -137,7 +145,9 @@ export function moveStudent(studentId: StudentId, targetRoomId: RoomId) {
   if (all[toIdx].occupants.length >= all[toIdx].capacity)
     throw new Error("Target room full");
   // remove from old
-  all[fromIdx].occupants = all[fromIdx].occupants.filter((id) => id !== studentId);
+  all[fromIdx].occupants = all[fromIdx].occupants.filter(
+    (id) => id !== studentId,
+  );
   // add to new
   all[toIdx].occupants.push(studentId);
   writeRooms(all);
@@ -149,7 +159,10 @@ export function listRequests(status?: RequestStatus): RoomRequest[] {
   return status ? all.filter((r) => r.status === status) : all;
 }
 
-export function createLeaveRequest(studentId: StudentId, note?: string): RoomRequest {
+export function createLeaveRequest(
+  studentId: StudentId,
+  note?: string,
+): RoomRequest {
   const req: RoomRequest = {
     id: uid(),
     type: "leave",
@@ -164,7 +177,11 @@ export function createLeaveRequest(studentId: StudentId, note?: string): RoomReq
   return req;
 }
 
-export function createChangeRequest(studentId: StudentId, targetRoomId: RoomId, note?: string): RoomRequest {
+export function createChangeRequest(
+  studentId: StudentId,
+  targetRoomId: RoomId,
+  note?: string,
+): RoomRequest {
   const req: RoomRequest = {
     id: uid(),
     type: "change",
@@ -180,7 +197,9 @@ export function createChangeRequest(studentId: StudentId, targetRoomId: RoomId, 
   return req;
 }
 
-export function approveRequest(id: RequestId): { ok: true } | { ok: false; error: string } {
+export function approveRequest(
+  id: RequestId,
+): { ok: true } | { ok: false; error: string } {
   const reqs = readRequests();
   const idx = reqs.findIndex((r) => r.id === id);
   if (idx === -1) return { ok: false, error: "Request not found" };

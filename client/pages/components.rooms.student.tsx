@@ -1,15 +1,43 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { listRooms, availableSeats, bookRoom, findStudentRoom, createChangeRequest, createLeaveRequest } from "@/lib/roomStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  listRooms,
+  availableSeats,
+  bookRoom,
+  findStudentRoom,
+  createChangeRequest,
+  createLeaveRequest,
+} from "@/lib/roomStore";
 import { StudentId, getStudentPublic } from "@/lib/studentStore";
 
-export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: StudentId | ""; onUpdated?: () => void }) {
+export function StudentRoomsPanel({
+  studentId,
+  onUpdated,
+}: {
+  studentId: StudentId | "";
+  onUpdated?: () => void;
+}) {
   const [now, setNow] = useState(Date.now());
   const [targetRoom, setTargetRoom] = useState<string>("");
   const rooms = useMemo(() => listRooms(), [now]);
-  const bookedRoom = useMemo(() => (studentId ? findStudentRoom(studentId) : null), [studentId, now]);
+  const bookedRoom = useMemo(
+    () => (studentId ? findStudentRoom(studentId) : null),
+    [studentId, now],
+  );
 
   useEffect(() => {
     const i = setInterval(() => setNow(Date.now()), 1200);
@@ -17,7 +45,9 @@ export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: Student
   }, []);
 
   if (!studentId) {
-    return <div className="text-sm text-muted-foreground">Login to book a room.</div>;
+    return (
+      <div className="text-sm text-muted-foreground">Login to book a room.</div>
+    );
   }
 
   if (bookedRoom) {
@@ -32,7 +62,10 @@ export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: Student
           <div className="rounded-md border p-3">
             <div className="font-medium">Room: {bookedRoom.name}</div>
             <div>Capacity: {bookedRoom.capacity}</div>
-            <div>Seats filled: {bookedRoom.occupants.length} / {bookedRoom.capacity}</div>
+            <div>
+              Seats filled: {bookedRoom.occupants.length} /{" "}
+              {bookedRoom.capacity}
+            </div>
           </div>
           <div>
             <div className="mb-1 text-sm font-medium">Roommates</div>
@@ -73,7 +106,9 @@ export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: Student
             </Button>
           </div>
           <div className="rounded-md border p-3">
-            <div className="mb-2 text-sm font-medium">Request to leave room</div>
+            <div className="mb-2 text-sm font-medium">
+              Request to leave room
+            </div>
             <Button
               variant="outline"
               onClick={() => {
@@ -94,7 +129,9 @@ export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: Student
     <Card>
       <CardHeader>
         <CardTitle>Available Rooms</CardTitle>
-        <CardDescription>Select a room to book. Auto-locked when full.</CardDescription>
+        <CardDescription>
+          Select a room to book. Auto-locked when full.
+        </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
         {rooms.length ? (
@@ -103,7 +140,9 @@ export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: Student
             return (
               <div key={r.id} className="rounded-md border p-3">
                 <div className="font-medium">{r.name}</div>
-                <div className="text-sm text-muted-foreground">Capacity {r.capacity}</div>
+                <div className="text-sm text-muted-foreground">
+                  Capacity {r.capacity}
+                </div>
                 <div className="text-sm">Available: {avail}</div>
                 <Button
                   className="mt-2"
@@ -125,7 +164,9 @@ export function StudentRoomsPanel({ studentId, onUpdated }: { studentId: Student
             );
           })
         ) : (
-          <div className="text-sm text-muted-foreground">No rooms yet. Ask warden to add rooms.</div>
+          <div className="text-sm text-muted-foreground">
+            No rooms yet. Ask warden to add rooms.
+          </div>
         )}
       </CardContent>
     </Card>

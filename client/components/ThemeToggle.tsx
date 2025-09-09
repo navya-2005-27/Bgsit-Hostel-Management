@@ -17,7 +17,11 @@ export default function ThemeToggle() {
         className="backdrop-blur supports-[backdrop-filter]:bg-background/60 border shadow hover:shadow-md transition-all"
         onClick={() => setTheme(isDark ? "light" : "dark")}
       >
-        {mounted && isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        {mounted && isDark ? (
+          <Sun className="h-5 w-5" />
+        ) : (
+          <Moon className="h-5 w-5" />
+        )}
       </Button>
     </div>
   );
