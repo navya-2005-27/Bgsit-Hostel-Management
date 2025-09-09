@@ -98,6 +98,7 @@ import {
   eventAnalytics,
 } from "@/lib/eventStore";
 import { useToast } from "@/hooks/use-toast";
+import { WardenRoomsPanel } from "./components.rooms.warden";
 
 export default function Warden() {
   const { toast } = useToast();
@@ -184,7 +185,7 @@ export default function Warden() {
     refresh();
     setSelectedId(record.id);
     setShowPassword(false);
-    toast({ title: "Login created", description: `Username: ${user}` });
+    toast({ title: "Login created", description: `Roll number: ${user}` });
   }
 
   function handleResetPassword() {
@@ -295,6 +296,7 @@ export default function Warden() {
           <TabsList>
             <TabsTrigger value="mess">Mess Management</TabsTrigger>
             <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="rooms">Room Allotment</TabsTrigger>
             <TabsTrigger value="attendance">Attendance Management</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
             <TabsTrigger value="complaints">Complaints</TabsTrigger>
@@ -543,6 +545,11 @@ export default function Warden() {
             </div>
           </TabsContent>
 
+          {/* Rooms */}
+          <TabsContent value="rooms" className="mt-6">
+            <WardenRoomsPanel />
+          </TabsContent>
+
           {/* Payments */}
           <TabsContent value="payments" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-3">
@@ -757,7 +764,7 @@ export default function Warden() {
                               {s.details.name}
                             </div>
                             <div className="truncate text-xs text-muted-foreground">
-                              @{s.credentials?.username || "no-username"}
+                              Roll: {s.credentials?.username || "-"}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -845,7 +852,7 @@ export default function Warden() {
                     <KeyRound className="h-5 w-5" /> Create Student Login
                   </CardTitle>
                   <CardDescription>
-                    Generate username and password for a student. Only warden
+                    Generate roll number and password for a student. Only warden
                     can view/change credentials.
                   </CardDescription>
                 </CardHeader>
@@ -859,7 +866,7 @@ export default function Warden() {
                     />
                   </div>
                   <div>
-                    <Label>Username</Label>
+                    <Label>Roll number</Label>
                     <div className="flex gap-2">
                       <Input
                         value={username}
@@ -940,7 +947,7 @@ export default function Warden() {
                           <SelectItem key={s.id} value={s.id}>
                             {s.details.name}{" "}
                             {s.credentials
-                              ? `(@${s.credentials.username})`
+                              ? `(roll: ${s.credentials.username})`
                               : ""}
                           </SelectItem>
                         ))}
@@ -950,9 +957,9 @@ export default function Warden() {
                   {selected?.credentials ? (
                     <div className="rounded-md border p-3 text-sm">
                       <div className="flex items-center justify-between">
-                        <span>Current username</span>
+                        <span>Current roll number</span>
                         <span className="font-medium">
-                          @{selected.credentials.username}
+                          {selected.credentials.username}
                         </span>
                       </div>
                       <div className="mt-2 flex items-center justify-between">
@@ -1194,7 +1201,7 @@ export default function Warden() {
                           {selected.details.name}
                         </div>
                         <div className="text-muted-foreground">
-                          @{selected.credentials?.username || "no-username"}
+                          Roll: {selected.credentials?.username || "-"}
                         </div>
                         {selected.details.profilePhotoDataUrl ? (
                           <img
