@@ -59,13 +59,17 @@ export function listRooms(): Room[] {
 }
 
 export function createRoom(name: string, capacity = 2): Room {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error("Room name is required");
+  const all = readRooms();
+  const exists = all.some((r) => r.name.trim().toLowerCase() === trimmed.toLowerCase());
+  if (exists) throw new Error("Room already exists!");
   const room: Room = {
     id: uid(),
-    name: name.trim(),
+    name: trimmed,
     capacity: Math.max(1, capacity),
     occupants: [],
   };
-  const all = readRooms();
   all.push(room);
   writeRooms(all);
   return room;
