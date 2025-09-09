@@ -650,6 +650,11 @@ export default function Warden() {
             </Card>
           </TabsContent>
 
+          {/* Parcels */}
+          <TabsContent value="parcels" className="mt-6">
+            <WardenParcelsPanel />
+          </TabsContent>
+
           {/* Attendance */}
           <TabsContent value="attendance" className="mt-6">
             <div className="grid gap-6 lg:grid-cols-3">
