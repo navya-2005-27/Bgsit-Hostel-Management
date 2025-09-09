@@ -763,13 +763,32 @@ export default function Warden() {
                         }
                       />
                     </div>
-                    <Button
-                      onClick={saveSettings}
-                      variant="outline"
-                      className="mt-2 w-full"
-                    >
-                      Save Geofence
-                    </Button>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <Button
+                        onClick={saveSettings}
+                        variant="outline"
+                      >
+                        Save Geofence
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        onClick={async () => {
+                          try {
+                            const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+                              navigator.geolocation.getCurrentPosition(resolve, reject)
+                            );
+                            setSettings({
+                              center: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+                              radiusM: settings?.radiusM ?? 50,
+                            });
+                          } catch {
+                            alert("Unable to access location.");
+                          }
+                        }}
+                      >
+                        Use current location
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
