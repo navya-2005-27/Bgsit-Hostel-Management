@@ -74,7 +74,7 @@ export function WardenParcelsPanel() {
                   <div className="font-medium">{p.parcelCode}</div>
                   <div className="text-xs text-muted-foreground">{new Date(p.receivedAt).toLocaleString()}</div>
                 </div>
-                <div className="text-xs text-muted-foreground">Student ID: {p.studentId}{p.carrier ? ` • ${p.carrier}` : ""}</div>
+                <div className="text-xs text-muted-foreground">Student: {getStudentPublic(p.studentId)?.details.name || p.studentId}{p.carrier ? ` • ${p.carrier}` : ""}</div>
                 <div className="mt-2 flex items-center gap-2">
                   <Input placeholder="Enter OTP" className="h-8 w-40" id={`otp-${p.id}`} />
                   <Button size="sm" onClick={() => {
