@@ -684,6 +684,30 @@ export default function Warden() {
                         <div className="mt-1 text-xs text-muted-foreground">
                           Date: {activeDate}
                         </div>
+                        <div className="mt-3 grid grid-cols-3 gap-2 text-left">
+                          <input
+                            readOnly
+                            className="col-span-2 rounded-md border px-3 py-2 text-xs"
+                            value={session.token}
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={async () => {
+                              try {
+                                await navigator.clipboard.writeText(session.token);
+                                alert("Token copied");
+                              } catch {
+                                alert("Copy failed. Select and copy manually.");
+                              }
+                            }}
+                          >
+                            Copy
+                          </Button>
+                        </div>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          Share token for manual entry if scanning fails.
+                        </div>
                       </div>
                       <Button
                         onClick={submitAttendance}
