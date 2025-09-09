@@ -41,6 +41,7 @@ import { ComplaintFeed } from "./components.complaints-feed";
 import { EventFeed, EventProposalForm } from "./components.events.student";
 import { StudentIDCard } from "./components.student-id";
 import { Input } from "@/components/ui/input";
+import { StudentRoomsPanel } from "./components.rooms.student";
 import { useEffect, useMemo, useState } from "react";
 
 export default function Student() {
@@ -153,6 +154,9 @@ export default function Student() {
             <TabsTrigger value="events" className="rounded-full">
               Events
             </TabsTrigger>
+            <TabsTrigger value="rooms" className="rounded-full">
+              Rooms
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="login" className="mt-6">
@@ -160,14 +164,14 @@ export default function Student() {
               <CardHeader>
                 <CardTitle>Student Login</CardTitle>
                 <CardDescription>
-                  Sign in with the username/password provided by the warden.
+                  Sign in with your roll number and password provided by the warden.
                 </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <Label>Username</Label>
+                  <Label>Roll number</Label>
                   <Input
-                    placeholder="e.g. riya.1234"
+                    placeholder="e.g. 22CSE123"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
@@ -244,7 +248,7 @@ export default function Student() {
                   <div className="space-y-2 text-sm">
                     <div className="font-medium">{selected.details.name}</div>
                     <div className="text-muted-foreground">
-                      @{selected.username || "no-username"}
+                      Roll: {selected.username || "-"}
                     </div>
                     {selected.details.profilePhotoDataUrl ? (
                       <img
@@ -436,6 +440,10 @@ export default function Student() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="rooms" className="mt-6">
+            <StudentRoomsPanel studentId={selectedId} onUpdated={() => setNow(Date.now())} />
           </TabsContent>
 
           <TabsContent value="complaints" className="mt-6">
