@@ -18,8 +18,6 @@ export function WardenRoomsPanel() {
     return () => clearInterval(i);
   }, []);
 
-  const students = listStudents();
-
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <Card className="lg:col-span-2">
